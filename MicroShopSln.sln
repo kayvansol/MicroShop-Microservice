@@ -39,11 +39,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MicroShop.Aggregator", "Mic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventBus.Messages", "EventBus.Messages", "{B19A7613-5C14-4BC9-87BD-9EF837B07142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBus.Messages", "EventBus.Messages\EventBus.Messages\EventBus.Messages.csproj", "{1EEC966E-0BB1-4C2A-B7D6-4D54EFC8F0EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBus.Messages", "BuildingBlocks\EventBus.Messages\EventBus.Messages.csproj", "{1EEC966E-0BB1-4C2A-B7D6-4D54EFC8F0EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotAPIGateway", "OcelotAPIGateway\OcelotAPIGateway\OcelotAPIGateway.csproj", "{129AA0DE-BD28-460C-972D-096EAD8C29ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotAPIGateway", "APIGateways\OcelotAPIGateway\OcelotAPIGateway.csproj", "{129AA0DE-BD28-460C-972D-096EAD8C29ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroShop.Aggregator", "MicroShop.Aggregator\MicroShop.Aggregator\MicroShop.Aggregator.csproj", "{75B64B80-F86F-44A4-8AE5-D3519208D840}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroShop.Aggregator", "APIGateways\MicroShop.Aggregator\MicroShop.Aggregator.csproj", "{75B64B80-F86F-44A4-8AE5-D3519208D840}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

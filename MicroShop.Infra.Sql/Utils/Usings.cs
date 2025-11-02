@@ -1,0 +1,10 @@
+﻿global using AutoMapper;
+global using MicroShop.Domain;
+global using MicroShop.Domain.DTOs.Category;
+global using MicroShop.Domain.Extensions;
+global using MicroShop.Infra.Sql.Context;
+global using Microsoft.EntityFrameworkCore.Query;
+global using MicroShop.Domain.Entities;
+global using System.Linq.Expressions;
+global using Microsoft.EntityFrameworkCore;
+global using static MicroShop.Domain.Extensions.PaginationExtension;

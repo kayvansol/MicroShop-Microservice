@@ -1,0 +1,12 @@
+﻿global using System;
+global using Xunit;
+global using MicroShop.Test.Utils;
+global using System.Net;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using AutoMapper;
+global using FluentAssertions;
+global using MicroShop.Infra.Sql.Context;
+global using MicroShop.Infra.Sql.Repositories;
+global using MicroShop.Core.Commands;
+global using System.Collections.Generic;

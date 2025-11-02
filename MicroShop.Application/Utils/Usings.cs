@@ -1,0 +1,11 @@
+﻿global using FluentValidation;
+global using MediatR;
+global using AutoMapper;
+global using MicroShop.Core.Commands;
+global using Newtonsoft.Json;
+global using MicroShop.Domain.Objects;
+global using System.Diagnostics;
+global using MicroShop.Domain.DTOs;
+global using MicroShop.Domain.Enums;
+global using MicroShop.Shared.Tools;
+global using MicroShop.Core.Queries;

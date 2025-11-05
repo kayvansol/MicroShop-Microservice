@@ -1,16 +1,21 @@
-﻿using MicroShop.Infra.Sql.Repositories.OrderRepo;
+﻿using EventBus.Messages.Events;
+using MassTransit;
+using MicroShop.Infra.Sql.Repositories.OrderRepo;
 
 namespace MicroShop.Application.UseCases.Order.Commands
 {
     public class AddOrderCommandHandler : IRequestHandler<AddOrderCommand, ResultDto<Unit>>
     {
+
         private readonly IOrderRepository orderRepository;
         private readonly IMapper mapper;
+        public IPublishEndpoint _publishEndpoint { get; }
 
-        public AddOrderCommandHandler(IOrderRepository orderRepository, IMapper mapper)
+        public AddOrderCommandHandler(IOrderRepository orderRepository, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             this.orderRepository = orderRepository;
             this.mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<ResultDto<Unit>> Handle(AddOrderCommand request, CancellationToken cancellationToken)
@@ -45,7 +50,15 @@ namespace MicroShop.Application.UseCases.Order.Commands
                 OrderItems = orderItems
             };
 
-            await orderRepository.CreateAsync(order);
+            var _order = await orderRepository.CreateAsync(order);
+
+            await _publishEndpoint.Publish<OrderCreatedEvent>(new 
+            {
+                OrderId = _order.OrderId,
+                CustomerId = _order.CustomerId,
+                Created = _order.OrderDate
+            }, cancellationToken);
+
 
             return ResultDto<Unit>.ReturnData(Unit.Value, (int)EnumResponseStatus.OK, (int)EnumResultCode.Success, EnumResultCode.Success.GetDisplayName());
         }

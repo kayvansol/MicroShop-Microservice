@@ -144,6 +144,7 @@ namespace MicroShop.OrderApi.Rest.Startup
             services.AddMassTransit(config => {
                 
                 config.AddConsumer<BasketCheckoutConsumer>();
+                config.AddConsumer<PaymentSucceededConsumer>();
 
                 config.UsingRabbitMq((ctx, cfg) => {
                     cfg.Host(configuration["EventBusSettings:HostAddress"]);
@@ -151,6 +152,7 @@ namespace MicroShop.OrderApi.Rest.Startup
                     cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
                     {
                         c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
+                        c.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
                     });
                 });
             });
@@ -158,6 +160,7 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             // General Configuration
             services.AddScoped<BasketCheckoutConsumer>();
+            services.AddScoped<PaymentSucceededConsumer>();
 
             #endregion
 

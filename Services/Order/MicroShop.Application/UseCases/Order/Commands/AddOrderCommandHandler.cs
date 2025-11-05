@@ -41,7 +41,7 @@ namespace MicroShop.Application.UseCases.Order.Commands
                 OrderDate = dto.OrderDate,
                 RequiredDate = dto.RequiredDate,
                 ShippedDate = dto.ShippedDate,
-                OrderStatus = dto.OrderStatus,
+                OrderStatus = (byte) EnumOrderState.Pending, // در انتظار پرداخت
                 OrderItems = orderItems
             };
 

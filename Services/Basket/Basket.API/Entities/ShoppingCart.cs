@@ -4,16 +4,16 @@ namespace Basket.API.Entities
 {
     public class ShoppingCart
     {
-        public string UserName { get; set; }
+        public int CustomerId { get; set; }
         public IList<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
 
         public ShoppingCart()
         {
         }
 
-        public ShoppingCart(string userName)
+        public ShoppingCart(int customerId)
         {
-            UserName = userName;
+            CustomerId = customerId;
         }
 
         public decimal TotalPrice
@@ -21,10 +21,12 @@ namespace Basket.API.Entities
             get
             {
                 decimal totalprice = 0;
+
                 foreach (var item in Items)
                 {
                     totalprice += item.Price * item.Quantity;
                 }
+                
                 return totalprice;
             }
         }

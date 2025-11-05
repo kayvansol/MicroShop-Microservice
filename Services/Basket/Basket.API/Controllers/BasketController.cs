@@ -5,6 +5,7 @@ using Basket.API.Repositories.Interfaces;
 using EventBus.Messages.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -15,13 +16,10 @@ namespace Basket.API.Controllers
     [Route("api/v1/[controller]")]
     public class BasketController : ControllerBase
     {
-
-
         private readonly IBasketRepository _repository;
         private readonly DiscountgRPCService _discountgRPCService;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IMapper _mapper;
-
 
 
         public BasketController(IBasketRepository repository, DiscountgRPCService discountgRPCService,
@@ -36,17 +34,13 @@ namespace Basket.API.Controllers
         }
 
 
-
-
-        [HttpGet("{userName}", Name = "GetBasket")]
+        [HttpGet("{customerId}", Name = "GetBasket")]
         [ProducesResponseType(typeof(ShoppingCart), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ShoppingCart>> GetBasket(string userName)
+        public async Task<ActionResult<ShoppingCart>> GetBasket(int customerId)
         {
-            var basket = await _repository.GetBasket(userName);
-            return Ok(basket ?? new ShoppingCart(userName));
+            var basket = await _repository.GetBasket(customerId);
+            return Ok(basket ?? new ShoppingCart(customerId));
         }
-
-
 
 
         [HttpPost]
@@ -58,25 +52,25 @@ namespace Basket.API.Controllers
             // consume Discount gRPC
 
             //TODO: Get Discount for all the items in Basket in gRPC Call.
+            
             foreach (var item in basket.Items)
             {
                 var coupon = await _discountgRPCService.GetDiscount(item.ProductId);
                 item.Price -= coupon.Amount;
+                item.Discount = coupon.Amount;
             }
+
             return Ok(await _repository.UpdateBasket(basket));
         }
 
 
-
-
-        [HttpDelete("{userName}", Name = "DeleteBasket")]
+        [HttpDelete("{customerId}", Name = "DeleteBasket")]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<bool>> DeleteBasket(string userName)
+        public async Task<ActionResult<bool>> DeleteBasket(int customerId)
         {
-            bool status = await _repository.DeleteBasket(userName);
+            bool status = await _repository.DeleteBasket(customerId);
             return Ok(status);
         }
-
 
 
         [Route("[action]")]
@@ -91,19 +85,26 @@ namespace Basket.API.Controllers
             // remove the basket
 
             // get existing basket with total price
-            var basket = await _repository.GetBasket(basketCheckout.UserName);
+
+            var basket = await _repository.GetBasket(basketCheckout.CustomerId);
             if (basket == null)
             {
                 return BadRequest();
             }
 
+
             // send checkout event to rabbitmq
+
             var eventMessage = _mapper.Map<BasketCheckoutEvent>(basketCheckout);
             eventMessage.TotalPrice = basket.TotalPrice;
+            eventMessage.BasketItems = JsonConvert.SerializeObject(basket.Items);// Products List
+            
             await _publishEndpoint.Publish(eventMessage);
 
+
             // remove the basket
-            bool status = await _repository.DeleteBasket(basket.UserName);
+
+            bool status = await _repository.DeleteBasket(basket.CustomerId);
 
             return Accepted(status);
         }

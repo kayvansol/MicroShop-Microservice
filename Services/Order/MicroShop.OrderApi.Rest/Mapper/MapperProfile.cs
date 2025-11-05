@@ -1,4 +1,6 @@
 ﻿
+using EventBus.Messages.Events;
+
 namespace MicroShop.OrderApi.Rest.Mapper
 {
     public class MapperProfile : Profile
@@ -17,8 +19,10 @@ namespace MicroShop.OrderApi.Rest.Mapper
             CreateMap<Customer, GetAllCustomerDto>();
 
             CreateMap<AddCustomerCommandDto, Customer>();
-            
+
             //CreateMap<AddOrderCommandDto, Order>();
+
+            CreateMap<AddOrderCommand, BasketCheckoutEvent>();
 
         }
     }

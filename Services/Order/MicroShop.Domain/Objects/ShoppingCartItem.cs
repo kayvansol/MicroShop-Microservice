@@ -1,4 +1,4 @@
-﻿namespace Basket.API.Entities
+﻿namespace MicroShop.Domain.Objects
 {
     public class ShoppingCartItem
     {        

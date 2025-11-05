@@ -13,9 +13,13 @@
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus.Messages\EventBus.Messages.csproj" />
     <ProjectReference Include="..\MicroShop.Application\MicroShop.Application.csproj" />
     <ProjectReference Include="..\MicroShop.Infra.Sql\MicroShop.Infra.Sql.csproj" />
     <ProjectReference Include="..\MicroShop.Shared\MicroShop.Shared.csproj" />

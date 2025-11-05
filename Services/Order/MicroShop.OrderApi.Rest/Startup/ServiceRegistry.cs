@@ -7,6 +7,8 @@ using MicroShop.OrderApi.Rest.Services;
 using MicroShop.OrderApi.Rest.Mapper;
 using MicroShop.Infra.Sql.Context;
 using Microsoft.Extensions.Options;
+using MassTransit;
+using MicroShop.OrderApi.Rest.EventBusConsumer;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -133,6 +135,29 @@ namespace MicroShop.OrderApi.Rest.Startup
 
                 options.OperationFilter<AuthorizeCheckOperationFilter>();
             });
+
+            #endregion
+
+            #region MassTransit
+
+            // MassTransit-RabbitMQ Configuration
+            services.AddMassTransit(config => {
+                
+                config.AddConsumer<BasketCheckoutConsumer>();
+
+                config.UsingRabbitMq((ctx, cfg) => {
+                    cfg.Host(configuration["EventBusSettings:HostAddress"]);
+
+                    cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
+                    {
+                        c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
+                    });
+                });
+            });
+            services.AddMassTransitHostedService();
+
+            // General Configuration
+            services.AddScoped<BasketCheckoutConsumer>();
 
             #endregion
 

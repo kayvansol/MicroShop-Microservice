@@ -2,8 +2,11 @@
 {
     public class BasketCheckoutEvent : IntegrationBaseEvent
     {
-        public string UserName { get; set; }
+        public int CustomerId { get; set; }
         public decimal TotalPrice { get; set; }
+        public string BasketItems { get; set; }
+
+        /*
 
         // BillingAddress
         public string FirstName { get; set; }
@@ -20,5 +23,7 @@
         public string Expiration { get; set; }
         public string CVV { get; set; }
         public int PaymentMethod { get; set; }
+        */
+        
     }
 }

@@ -6,6 +6,8 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
         //Task<List<GetAllCustomerDto>> GetAllCustomersAsync();
 
         Task<Order> CreateAsync(Order data);
-    
+
+        Task<bool> UpdateStatusAsync(int OrderId);
+
     }
 }

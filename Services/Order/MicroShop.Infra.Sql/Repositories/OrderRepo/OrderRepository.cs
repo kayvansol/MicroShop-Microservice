@@ -1,4 +1,7 @@
 ﻿
+using MicroShop.Domain.Enums;
+using System.Data;
+
 namespace MicroShop.Infra.Sql.Repositories.OrderRepo
 {
     public class OrderRepository : Repository<Order, int>, IOrderRepository
@@ -24,5 +27,21 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
             return data;
         }
 
+        public Task<bool> UpdateStatusAsync(int OrderId)
+        {
+
+            var order = _context.Orders.Where(x => x.OrderId == OrderId).SingleOrDefault();
+
+            order.OrderStatus = (byte) EnumOrderState.Paid; // پرداخت شده
+
+            _context.Entry(order).Property(i => i.OrderStatus).IsModified = true;
+
+            //_context.Entry(order).State = EntityState.Modified;
+
+            _context.SaveChanges();
+
+            return Task.FromResult(true);
+
+        }
     }
 }

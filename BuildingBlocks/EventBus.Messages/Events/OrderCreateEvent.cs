@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventBus.Messages.Events
 {
-    public class PaymentSucceededEvent //: IntegrationBaseEvent
+    public class OrderCreateEvent : IntegrationBaseEvent
     {
         public int OrderId { get; set; }
         public int CustomerId { get; set; }

@@ -8,5 +8,7 @@ namespace MicroShop.Domain.DTOs.Product
         public int CategoryId { get; set; }
 
         public decimal Price { get; set; }
+
+        public int Inventory { get; set; }
     }
 }

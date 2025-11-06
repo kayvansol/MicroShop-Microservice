@@ -33,21 +33,21 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config => {
 
-    config.AddConsumer<OrderCreatedConsumer>();
+    config.AddConsumer<InventorySuccessConsumer>();
 
     config.UsingRabbitMq((ctx, cfg) => {
         cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
 
         cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
         {
-            c.ConfigureConsumer<OrderCreatedConsumer>(ctx);
+            c.ConfigureConsumer<InventorySuccessConsumer>(ctx);
         });
     });
 });
 builder.Services.AddMassTransitHostedService();
 
 // General Configuration
-builder.Services.AddScoped<OrderCreatedConsumer>();
+builder.Services.AddScoped<InventorySuccessConsumer>();
 
 #endregion
 

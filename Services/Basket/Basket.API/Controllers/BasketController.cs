@@ -106,6 +106,10 @@ namespace Basket.API.Controllers
 
             bool status = await _repository.DeleteBasket(basket.CustomerId);
 
+            //Note : this is for ensuring that message delivered to the queue ...
+
+            Thread.Sleep(5000); 
+
             return Accepted(status);
         }
 

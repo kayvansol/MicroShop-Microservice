@@ -1,22 +1,17 @@
 ﻿using EventBus.Messages.Events;
 using MassTransit;
-using MassTransit.Transports;
-using Microsoft.Extensions.Logging;
 using Payment.API.Repositories.PaymentRepo;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Payment.API.EventBusConsumer
 {
 
-    public class OrderCreatedConsumer : IConsumer<OrderCreatedEvent>
+    public class InventorySuccessConsumer : IConsumer<InventorySuccessEvent>
     {        
-        private readonly ILogger<OrderCreatedConsumer> _logger;
+        private readonly ILogger<InventorySuccessConsumer> _logger;
         private readonly IPaymentRepository repository;
         public IPublishEndpoint _publishEndpoint { get; }
 
-        public OrderCreatedConsumer(ILogger<OrderCreatedConsumer> logger, IPaymentRepository repository, IPublishEndpoint publishEndpoint)
+        public InventorySuccessConsumer(ILogger<InventorySuccessConsumer> logger, IPaymentRepository repository, IPublishEndpoint publishEndpoint)
         {            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.repository = repository;
@@ -24,7 +19,7 @@ namespace Payment.API.EventBusConsumer
         }
 
 
-        public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
+        public async Task Consume(ConsumeContext<InventorySuccessEvent> context)
         {
 
             Entities.Payment payment = new Entities.Payment()
@@ -43,9 +38,10 @@ namespace Payment.API.EventBusConsumer
             {
                 OrderId = context.Message.OrderId,
                 CustomerId = context.Message.CustomerId,
-                Created = context.Message.CreationDate
+                Created = context.Message.Created
             });
 
+            Thread.Sleep(5000);
 
         }
     }

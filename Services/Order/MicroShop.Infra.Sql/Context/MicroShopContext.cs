@@ -145,6 +145,7 @@ public partial class MicroShopContext : DbContext
 
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.Inventory).HasColumnName("inventory").HasDefaultValueSql("((0))");
             entity.Property(e => e.Price)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("price");

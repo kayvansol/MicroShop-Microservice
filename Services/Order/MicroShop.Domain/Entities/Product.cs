@@ -11,6 +11,8 @@ public partial class Product: BaseEntity<int>
 
     public decimal Price { get; set; }
 
+    public int Inventory { get; set; }
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

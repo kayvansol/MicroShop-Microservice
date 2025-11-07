@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MicroShop.Domain.Enums
 {
@@ -20,7 +21,13 @@ namespace MicroShop.Domain.Enums
         Processing = 2,
 
         [Display(Name = "آماده ارسال")]
-        Packed = 3
+        Packed = 3,
+
+        [Display(Name = "عدم موجودی")]
+        OutOfStock = 4,
+
+        [Display(Name = "پرداخت ناموفق")]
+        PaymentFailed = 5
 
     }
 }

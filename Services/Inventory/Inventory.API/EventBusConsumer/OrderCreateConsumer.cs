@@ -24,7 +24,15 @@ namespace Inventory.API.EventBusConsumer
 
             if (IsThereEmptyInventory)
             {
-                // InventoryFailedEvent
+                
+                await _publishEndpoint.Publish<InventoryFailedEvent>(new
+                {
+                    OrderId = context.Message.OrderId
+                });
+
+
+                Thread.Sleep(5000);
+
             }
             else
             {

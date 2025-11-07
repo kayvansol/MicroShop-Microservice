@@ -16,7 +16,7 @@ namespace Inventory.API.Repositories
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT COUNT(production.products.product_id) AS Count FROM            production.products INNER JOIN sales.order_items ON production.products.product_id = sales.order_items.product_id WHERE (production.products.inventory <= 0) AND (sales.order_items.order_id = @OrderId)";
+                string query = "SELECT COUNT(production.products.product_id) AS Count FROM            production.products INNER JOIN sales.order_items ON production.products.product_id = sales.order_items.product_id WHERE (production.products.inventory - sales.order_items.quantity <= 0) AND (sales.order_items.order_id = @OrderId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {

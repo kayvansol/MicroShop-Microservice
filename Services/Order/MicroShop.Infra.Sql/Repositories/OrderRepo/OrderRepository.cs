@@ -1,4 +1,5 @@
 ﻿
+using MicroShop.Domain;
 using MicroShop.Domain.Enums;
 using System.Data;
 
@@ -27,21 +28,48 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
             return data;
         }
 
-        public Task<bool> UpdateStatusAsync(int OrderId)
+        public async Task<bool> UpdateStatusAsync(int OrderId, EnumOrderState State)
         {
 
-            var order = _context.Orders.Where(x => x.OrderId == OrderId).SingleOrDefault();
+            var order = await _context.Orders.Where(x => x.OrderId == OrderId).SingleOrDefaultAsync();
 
-            order.OrderStatus = (byte) EnumOrderState.Paid; // پرداخت شده
+            if (order == null)
+                return false;
+
+            order.OrderStatus = (byte) State;
 
             _context.Entry(order).Property(i => i.OrderStatus).IsModified = true;
 
             //_context.Entry(order).State = EntityState.Modified;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return Task.FromResult(true);
+            return true;
 
         }
+
+        public async Task<bool> UpdateInventoriesAsync(int OrderId)
+        {
+
+            var orderItems = await _context.OrderItems.Where(x => x.OrderId == OrderId).ToListAsync();
+
+            foreach (var item in orderItems)
+            {
+                var product = _context.Products.Where(x => x.ProductId == item.ProductId).SingleOrDefault();
+
+                product.Inventory -= item.Quantity;
+
+                if (product == null)
+                    continue;
+
+                _context.Entry(product).Property(i => i.Inventory).IsModified = true;
+
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using MicroShop.Domain.Enums;
+
 namespace MicroShop.Infra.Sql.Repositories.OrderRepo
 {
     public interface IOrderRepository : IRepository<Order, int>
@@ -7,7 +9,9 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
 
         Task<Order> CreateAsync(Order data);
 
-        Task<bool> UpdateStatusAsync(int OrderId);
+        Task<bool> UpdateStatusAsync(int OrderId, EnumOrderState State);
+
+        Task<bool> UpdateInventoriesAsync(int OrderId);
 
     }
 }

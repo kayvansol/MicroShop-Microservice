@@ -1,5 +1,6 @@
 ﻿using EventBus.Messages.Events;
 using MassTransit;
+using Payment.API.Enums;
 using Payment.API.Repositories.PaymentRepo;
 
 namespace Payment.API.EventBusConsumer
@@ -26,20 +27,35 @@ namespace Payment.API.EventBusConsumer
             {
                 OrderId = context.Message.OrderId,
                 CardNumber = "5435443689665465",
-                PaymentMethod = 1,
-                Status = 1
+                PaymentMethod = (short) EnumPaymentMethod.Online
             };
 
-            await repository.CreateAsync(payment);
 
-            // _logger.LogInformation("BasketCheckoutEvent consumed successfully. Created Order Id : {newOrderId}", result);
-
-            await _publishEndpoint.Publish<PaymentSucceededEvent>(new
+            if (DateTime.Now.Millisecond > 500) // Can Pay ...
             {
-                OrderId = context.Message.OrderId,
-                CustomerId = context.Message.CustomerId,
-                Created = context.Message.Created
-            });
+                payment.Status = (short)EnumPaymentState.PaymentSucceeded;
+
+                await repository.CreateAsync(payment);
+
+                await _publishEndpoint.Publish<PaymentSucceededEvent>(new
+                {
+                    OrderId = context.Message.OrderId
+                });
+
+            }
+            else // Can Not Pay ...
+            {
+
+                payment.Status = (short)EnumPaymentState.PaymentFailed;
+
+                await repository.CreateAsync(payment);
+
+                await _publishEndpoint.Publish<PaymentFailedEvent>(new
+                {
+                    OrderId = context.Message.OrderId
+                });
+
+            }
 
             Thread.Sleep(5000);
 

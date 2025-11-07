@@ -27,7 +27,13 @@ namespace MicroShop.OrderApi.Rest.EventBusConsumer
         public async Task Consume(ConsumeContext<PaymentSucceededEvent> context)
         {
 
-            var result = await repository.UpdateStatusAsync(context.Message.OrderId);
+            // پرداخت شده
+            var result = await repository.UpdateStatusAsync(context.Message.OrderId, EnumOrderState.Paid); 
+
+
+            // آپدیت و کسر موجودی کالاها
+            var res = await repository.UpdateInventoriesAsync(context.Message.OrderId); 
+
 
             _logger.LogInformation("PaymentSucceededEvent consumed successfully. Created result : ", result);
 

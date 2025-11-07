@@ -145,6 +145,8 @@ namespace MicroShop.OrderApi.Rest.Startup
                 
                 config.AddConsumer<BasketCheckoutConsumer>();
                 config.AddConsumer<PaymentSucceededConsumer>();
+                config.AddConsumer<InventoryFailedConsumer>();
+                config.AddConsumer<PaymentFailedConsumer>();
 
                 config.UsingRabbitMq((ctx, cfg) => {
                     cfg.Host(configuration["EventBusSettings:HostAddress"]);
@@ -153,6 +155,8 @@ namespace MicroShop.OrderApi.Rest.Startup
                     {
                         c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
                         c.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
+                        c.ConfigureConsumer<InventoryFailedConsumer>(ctx);
+                        c.ConfigureConsumer<PaymentFailedConsumer>(ctx);
                     });
                 });
             });
@@ -161,6 +165,8 @@ namespace MicroShop.OrderApi.Rest.Startup
             // General Configuration
             services.AddScoped<BasketCheckoutConsumer>();
             services.AddScoped<PaymentSucceededConsumer>();
+            services.AddScoped<InventoryFailedConsumer>();
+            services.AddScoped<PaymentFailedConsumer>();
 
             #endregion
 

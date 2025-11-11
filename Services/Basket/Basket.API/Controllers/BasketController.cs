@@ -95,11 +95,23 @@ namespace Basket.API.Controllers
 
             // send checkout event to rabbitmq
 
+            /*
             var eventMessage = _mapper.Map<BasketCheckoutEvent>(basketCheckout);
             eventMessage.TotalPrice = basket.TotalPrice;
-            eventMessage.BasketItems = JsonConvert.SerializeObject(basket.Items);// Products List
+            eventMessage.BasketItems = ""; // JsonConvert.SerializeObject(basket.Items);// Products List
             
             await _publishEndpoint.Publish(eventMessage);
+            */
+
+
+            await _publishEndpoint.Publish(new BasketCheckoutEvent
+            {                
+                BasketItems = JsonConvert.SerializeObject(basket.Items), // Products List
+                TotalPrice = basket.TotalPrice,
+                CustomerId = basket.CustomerId,
+                CorrelationId = Guid.NewGuid(),
+                OrderId = 0
+            });
 
 
             // remove the basket
@@ -108,7 +120,7 @@ namespace Basket.API.Controllers
 
             //Note : this is for ensuring that message delivered to the queue ...
 
-            Thread.Sleep(5000); 
+            //Thread.Sleep(5000); 
 
             return Accepted(status);
         }

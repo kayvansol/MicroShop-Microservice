@@ -25,27 +25,30 @@ namespace Inventory.API.EventBusConsumer
             if (IsThereEmptyInventory)
             {
                 
-                await _publishEndpoint.Publish<InventoryFailedEvent>(new
+                await _publishEndpoint.Publish(new InventoryFailedEvent
                 {
-                    OrderId = context.Message.OrderId
+                    CorrelationId = context.Message.CorrelationId, // CorrelationId
+                    OrderId = context.Message.OrderId,
+                    Reason = "Item out of stock"
                 });
 
 
-                Thread.Sleep(5000);
+                //Thread.Sleep(5000);
 
             }
             else
             {
 
-                await _publishEndpoint.Publish<InventorySuccessEvent>(new
+                await _publishEndpoint.Publish(new InventorySuccessEvent
                 {
+                    CorrelationId = context.Message.CorrelationId, // CorrelationId
                     OrderId = context.Message.OrderId,
                     CustomerId = context.Message.CustomerId,
                     Created = context.Message.Created
                 });
 
 
-                Thread.Sleep(5000);
+                //Thread.Sleep(5000);
 
             }
 

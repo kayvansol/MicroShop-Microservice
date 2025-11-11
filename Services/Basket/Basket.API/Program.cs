@@ -26,7 +26,9 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // gRPC Configuration
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
     (o => o.Address = new Uri(builder.Configuration["gRPCSettings:DiscountUrl"]));
+
 builder.Services.AddScoped<DiscountgRPCService>();
+
 
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config =>
@@ -34,9 +36,14 @@ builder.Services.AddMassTransit(config =>
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
+
+        cfg.UseInMemoryOutbox();
+
+        cfg.ConfigureEndpoints(ctx);
+
     });
 });
-builder.Services.AddMassTransitHostedService();
+//builder.Services.AddMassTransitHostedService();
 
 
 

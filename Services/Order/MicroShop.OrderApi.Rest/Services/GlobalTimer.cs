@@ -21,7 +21,7 @@ namespace MicroShop.OrderApi.Rest.Services
 
         private void DoWork(object? state)
         {
-            Console.WriteLine($"UpTime: {stopwatch.ElapsedMilliseconds} ms");
+            //Console.WriteLine($"UpTime: {stopwatch.ElapsedMilliseconds} ms");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

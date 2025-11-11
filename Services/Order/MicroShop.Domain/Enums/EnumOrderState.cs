@@ -14,20 +14,20 @@ namespace MicroShop.Domain.Enums
         [Display(Name = "در انتظار پرداخت")]
         Pending = 0,
 
-        [Display(Name = "پرداخت‌ شده")]
-        Paid = 1,
-
-        [Display(Name = "در حال پردازش")]
-        Processing = 2,
-
-        [Display(Name = "آماده ارسال")]
-        Packed = 3,
-
         [Display(Name = "عدم موجودی")]
-        OutOfStock = 4,
+        OutOfStock = 1,
+
+        [Display(Name = "پرداخت‌ شده")]
+        Paid = 2,
 
         [Display(Name = "پرداخت ناموفق")]
-        PaymentFailed = 5
+        PaymentFailed = 3,
+
+        [Display(Name = "در حال پردازش")]
+        Processing = 4,
+
+        [Display(Name = "آماده ارسال")]
+        Packed = 5
 
     }
 }

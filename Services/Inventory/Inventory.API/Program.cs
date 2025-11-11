@@ -24,15 +24,16 @@ builder.Services.AddMassTransit(config => {
     config.AddConsumer<OrderCreateConsumer>();
 
     config.UsingRabbitMq((ctx, cfg) => {
+
         cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
 
-        cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
-        {
-            c.ConfigureConsumer<OrderCreateConsumer>(ctx);
-        });
+        cfg.UseInMemoryOutbox();
+
+        cfg.ConfigureEndpoints(ctx);
+
     });
 });
-builder.Services.AddMassTransitHostedService();
+//builder.Services.AddMassTransitHostedService();
 
 // General Configuration
 builder.Services.AddScoped<OrderCreateConsumer>();

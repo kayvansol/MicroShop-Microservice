@@ -31,15 +31,18 @@ namespace Payment.API.EventBusConsumer
             };
 
 
-            if (DateTime.Now.Millisecond > 500) // Can Pay ...
+            if (true) // Can Pay ...
             {
                 payment.Status = (short)EnumPaymentState.PaymentSucceeded;
 
                 await repository.CreateAsync(payment);
 
-                await _publishEndpoint.Publish<PaymentSucceededEvent>(new
+                await _publishEndpoint.Publish(new PaymentSucceededEvent
                 {
-                    OrderId = context.Message.OrderId
+                    CorrelationId = context.Message.CorrelationId, // CorrelationId
+                    OrderId = context.Message.OrderId,
+                    CustomerId = context.Message.CustomerId,
+                    Created = context.Message.Created
                 });
 
             }
@@ -50,14 +53,16 @@ namespace Payment.API.EventBusConsumer
 
                 await repository.CreateAsync(payment);
 
-                await _publishEndpoint.Publish<PaymentFailedEvent>(new
+                await _publishEndpoint.Publish(new PaymentFailedEvent
                 {
-                    OrderId = context.Message.OrderId
+                    CorrelationId = context.Message.CorrelationId, // CorrelationId
+                    OrderId = payment.OrderId,
+                    Reason = "Insufficient funds"
                 });
 
             }
 
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
 
         }
     }

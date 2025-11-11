@@ -7,7 +7,7 @@ namespace MicroShop.OrderApi.Rest.Controllers
     {
         [AllowAnonymous]
         [HttpPost("InsertOrder")]
-        public async Task<ResultDto<Unit>> InsertOrder(AddOrderCommand command, CancellationToken cancellationToken) => await Mediator.Send(command, cancellationToken);
+        public async Task<ResultDto<OrderDto>> InsertOrder(AddOrderCommand command, CancellationToken cancellationToken) => await Mediator.Send(command, cancellationToken);
 
     }
 }

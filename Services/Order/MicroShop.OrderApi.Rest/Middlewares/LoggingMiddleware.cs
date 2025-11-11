@@ -90,7 +90,7 @@ namespace MicroShop.OrderApi.Rest.Middlewares
                 // Log request details  
                 //Console.WriteLine(logStr);
 
-                await logging.Log(logStr, "", LogLevel.Information);
+                //await logging.Log(logStr, "", LogLevel.Information);
 
                 return requestBody;
             }

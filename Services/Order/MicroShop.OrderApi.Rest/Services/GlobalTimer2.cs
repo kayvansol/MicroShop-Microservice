@@ -14,12 +14,12 @@ namespace MicroShop.OrderApi.Rest.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Background task (GlobalTimer 2) is running...");
+                //_logger.LogInformation("Background task (GlobalTimer 2) is running...");
 
-                Console.WriteLine("Background task (GlobalTimer 2) is running...");
+                //Console.WriteLine("Background task (GlobalTimer 2) is running...");
 
                 // Perform background task
-                await Task.Delay(5000, stoppingToken);
+                //await Task.Delay(5000, stoppingToken);
             }
         }
     }

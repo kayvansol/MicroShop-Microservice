@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace EventBus.Messages.Events
 {
-    public class PaymentFailedEvent : IntegrationBaseEvent
+    public class ProcessEndedEvent : IntegrationBaseEvent
     {
-        public int OrderId { get; set; }        
-        public string Reason { get; set; } 
+        public int OrderId { get; set; }
     }
 }

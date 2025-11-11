@@ -8,6 +8,7 @@ namespace EventBus.Messages.Events
 {
     public class InventoryFailedEvent : IntegrationBaseEvent
     {
-        public int OrderId { get; set; }        
+        public int OrderId { get; set; }   
+        public string Reason { get; set; }     
     }
 }

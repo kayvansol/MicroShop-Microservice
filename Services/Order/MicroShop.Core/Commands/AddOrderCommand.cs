@@ -1,8 +1,9 @@
-﻿using MicroShop.Domain.DTOs.Order;
+﻿using MicroShop.Domain;
+using MicroShop.Domain.DTOs.Order;
 
 namespace MicroShop.Core.Commands
 {
-    public record AddOrderCommand(AddOrderCommandDto AddDto) : IRequest<ResultDto<Unit>>
+    public record AddOrderCommand(AddOrderCommandDto AddDto) : IRequest<ResultDto<OrderDto>>
     {
 
     }

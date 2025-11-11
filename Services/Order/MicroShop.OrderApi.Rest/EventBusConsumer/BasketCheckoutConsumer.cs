@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using EventBus.Messages.Events;
 using MassTransit;
+using MassTransit.Transports;
 using MediatR;
+using MicroShop.Domain;
 using MicroShop.Domain.DTOs.Order;
 using MicroShop.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MicroShop.OrderApi.Rest.EventBusConsumer
@@ -57,11 +60,22 @@ namespace MicroShop.OrderApi.Rest.EventBusConsumer
                 OrderStatus = (byte)EnumOrderState.Pending, // در انتظار پرداخت
                 RequiredDate = DateTime.Now.AddDays(2),
                 ShippedDate = DateTime.Now.AddDays(3)
-
             });
 
 
             var result = await _mediator.Send(command);
+
+            var _order = result.Data;
+
+
+            await context.Publish(new OrderCreateEvent
+            {
+                CorrelationId = context.Message.CorrelationId, // CorrelationId
+                OrderId = _order?.OrderId ?? 0,
+                CustomerId = _order?.CustomerId ?? 0,
+                Created = _order?.OrderDate ?? DateTime.Now
+            });
+            
 
             _logger.LogInformation("BasketCheckoutEvent consumed successfully. Created Order Id : {newOrderId}", result);
 

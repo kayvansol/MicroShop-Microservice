@@ -9,6 +9,8 @@ using MicroShop.Infra.Sql.Context;
 using Microsoft.Extensions.Options;
 using MassTransit;
 using MicroShop.OrderApi.Rest.EventBusConsumer;
+using MicroShop.OrderApi.Rest.SagaStateMachine;
+using System.Text.Json.Serialization;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -25,16 +27,98 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             #region Public
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
 
             services.AddHttpContextAccessor();
 
             #endregion
 
+            #region MassTransit
+
+            // MassTransit-RabbitMQ Configuration
+            services.AddMassTransit(config => {
+
+                config.SetKebabCaseEndpointNameFormatter();
+
+                config.AddConsumer<BasketCheckoutConsumer>();
+                config.AddConsumer<PaymentSucceededConsumer>();
+                config.AddConsumer<InventoryFailedConsumer>();
+                config.AddConsumer<PaymentFailedConsumer>();
+                config.AddConsumer<OrderCanceledConsumer>();
+                config.AddConsumer<ProcessEndedConsumer>();
+
+                //config.AddSagaStateMachine
+                config.AddSagaStateMachine<OrderStateMachine, OrderState>().InMemoryRepository();
+
+                config.UsingRabbitMq((ctx, cfg) => {
+
+                    cfg.Host(configuration["EventBusSettings:HostAddress"]);
+
+                    cfg.UseInMemoryOutbox();
+
+                    /*cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
+                    {
+                        //c.UseConcurrencyLimit(1);
+
+                        //c.ConcurrentMessageLimit = 1;
+
+                        c.UseInMemoryOutbox();
+
+                        c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
+                        c.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
+                        c.ConfigureConsumer<InventoryFailedConsumer>(ctx);
+                        c.ConfigureConsumer<PaymentFailedConsumer>(ctx);
+                        c.ConfigureConsumer<OrderCanceledConsumer>(ctx);
+                    });*/
+
+
+
+
+                    /*
+
+                    // Configure a global retry policy
+                    // --- Resilient Processing Configuration ---
+
+                    // Stage 2: For longer outages, schedule message for redelivery.
+                    // This middleware will take over after the initial retries from UseMessageRetry have failed.
+                    cfg.UseDelayedRedelivery(r =>
+                        // Configure 5 redelivery attempts with a 10-minute interval between each.
+                        //r.Interval(5, TimeSpan.FromMinutes(10)));
+                        r.Interval(5, TimeSpan.FromSeconds(3)));
+
+                    // Stage 1: For transient faults, retry the message immediately a few times.
+                    cfg.UseMessageRetry(r =>
+                        // Retry 3 times with the specified intervals between attempts.
+                        r.Intervals(
+                            TimeSpan.FromMilliseconds(500), // 1st retry after 0.5s
+                            TimeSpan.FromSeconds(5),        // 2nd retry after 5s
+                            TimeSpan.FromSeconds(10)        // 3rd retry after 10s
+                        ));
+
+                    */
+
+                    // --- End of Configuration ---
+                    cfg.ConfigureEndpoints(ctx);
+
+                });
+            });
+            //services.AddMassTransitHostedService(true);
+
+            // General Configuration
+            services.AddScoped<BasketCheckoutConsumer>();
+            services.AddScoped<PaymentSucceededConsumer>();
+            services.AddScoped<InventoryFailedConsumer>();
+            services.AddScoped<PaymentFailedConsumer>();
+            services.AddScoped<OrderCanceledConsumer>();
+            services.AddScoped<ProcessEndedConsumer>();
+
+            #endregion
+
             #region Hosted Service
 
-            services.AddHostedService<GlobalTimer>();
-            services.AddHostedService<GlobalTimer2>();
+            //services.AddHostedService<GlobalTimer>();
+            //services.AddHostedService<GlobalTimer2>();
 
             #endregion
 
@@ -138,37 +222,7 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             #endregion
 
-            #region MassTransit
-
-            // MassTransit-RabbitMQ Configuration
-            services.AddMassTransit(config => {
-                
-                config.AddConsumer<BasketCheckoutConsumer>();
-                config.AddConsumer<PaymentSucceededConsumer>();
-                config.AddConsumer<InventoryFailedConsumer>();
-                config.AddConsumer<PaymentFailedConsumer>();
-
-                config.UsingRabbitMq((ctx, cfg) => {
-                    cfg.Host(configuration["EventBusSettings:HostAddress"]);
-
-                    cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
-                    {
-                        c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
-                        c.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
-                        c.ConfigureConsumer<InventoryFailedConsumer>(ctx);
-                        c.ConfigureConsumer<PaymentFailedConsumer>(ctx);
-                    });
-                });
-            });
-            services.AddMassTransitHostedService();
-
-            // General Configuration
-            services.AddScoped<BasketCheckoutConsumer>();
-            services.AddScoped<PaymentSucceededConsumer>();
-            services.AddScoped<InventoryFailedConsumer>();
-            services.AddScoped<PaymentFailedConsumer>();
-
-            #endregion
+            
 
         }
 

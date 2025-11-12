@@ -11,6 +11,7 @@ using MassTransit;
 using MicroShop.OrderApi.Rest.EventBusConsumer;
 using MicroShop.OrderApi.Rest.SagaStateMachine;
 using System.Text.Json.Serialization;
+using MassTransit.EntityFrameworkCoreIntegration;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -36,6 +37,11 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             #region MassTransit
 
+            services.AddDbContext<OrderStateDbContext>(options =>
+            {
+                options.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"]);
+            });
+
             // MassTransit-RabbitMQ Configuration
             services.AddMassTransit(config => {
 
@@ -49,13 +55,38 @@ namespace MicroShop.OrderApi.Rest.Startup
                 config.AddConsumer<ProcessEndedConsumer>();
 
                 //config.AddSagaStateMachine
-                config.AddSagaStateMachine<OrderStateMachine, OrderState>().InMemoryRepository();
+                config.AddSagaStateMachine<OrderStateMachine, OrderState>().EntityFrameworkRepository(r =>
+                {
+                    r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // 🔒 جلوگیری از دسترسی همزمان
+
+                    /*  # migrations :
+
+                        Add-Migration InitOrderSaga -c OrderStateDbContext
+
+                        Update-Database -Context OrderStateDbContext
+
+                    */
+
+                    r.AddDbContext<DbContext, OrderStateDbContext>((provider, optionsBuilder) =>
+                    {
+                        optionsBuilder.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"]);
+                    });
+
+                });
+
+                // فعال‌سازی Outbox
+                config.AddEntityFrameworkOutbox<OrderStateDbContext>(o =>
+                {
+                    o.QueryDelay = TimeSpan.FromSeconds(10);
+                    o.DuplicateDetectionWindow = TimeSpan.FromMinutes(1);
+                    o.UseBusOutbox(); // ✅ پیام‌ها بعد از Commit ارسال می‌شن
+                });
 
                 config.UsingRabbitMq((ctx, cfg) => {
 
                     cfg.Host(configuration["EventBusSettings:HostAddress"]);
 
-                    cfg.UseInMemoryOutbox();
+                    //cfg.UseInMemoryOutbox();
 
                     /*cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
                     {

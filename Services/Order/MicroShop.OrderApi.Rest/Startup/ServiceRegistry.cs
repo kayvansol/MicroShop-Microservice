@@ -3,16 +3,10 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using MicroShop.OrderApi.Rest.Attributes;
 using MicroShop.OrderApi.Rest.Middlewares;
-using MicroShop.OrderApi.Rest.Services;
 using MicroShop.OrderApi.Rest.Mapper;
 using MicroShop.Infra.Sql.Context;
-using Microsoft.Extensions.Options;
 using MassTransit;
-using MicroShop.OrderApi.Rest.EventBusConsumer;
-using MicroShop.OrderApi.Rest.SagaStateMachine;
 using System.Text.Json.Serialization;
-using MassTransit.EntityFrameworkCoreIntegration;
-using MicroShop.OrderApi.Rest.Data;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -22,150 +16,17 @@ namespace MicroShop.OrderApi.Rest.Startup
         public static void Register(this IServiceCollection services, IConfiguration configuration)
         {
 
-            /*services.AddHttpsRedirection(options =>
+            #region Public
+
+            services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 80;
-            });*/
-
-            #region Public
+            });
 
             services.AddControllers().AddJsonOptions(options =>
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
 
             services.AddHttpContextAccessor();
-
-            #endregion
-
-            #region Event Store
-
-            services.AddDbContext<OrderEventStoreDbContext>(options =>
-                        options.UseSqlServer(configuration["ApplicationOptions:OrderEventStoreConnection"]));
-
-            services.AddScoped<IOrderEventStoreService, OrderEventStoreService>();
-
-            /*
-
-                  Add-Migration InitialOrderEventStoreMigration -c OrderEventStoreDbContext 
-                        
-                  Update-Database -Context OrderEventStoreDbContext
-
-            */
-
-            #endregion
-
-            #region MassTransit
-
-            services.AddDbContext<OrderStateDbContext>(options =>
-            {
-                options.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"]);
-            });
-
-            // MassTransit-RabbitMQ Configuration
-            services.AddMassTransit(config => {
-
-                config.SetKebabCaseEndpointNameFormatter();
-
-                config.AddConsumer<BasketCheckoutConsumer>();
-                config.AddConsumer<ProcessEndConsumer>();
-                config.AddConsumer<InventoryFailedConsumer>();
-                config.AddConsumer<PaymentFailedConsumer>();
-                config.AddConsumer<OrderCanceledConsumer>();
-                config.AddConsumer<ProcessEndedConsumer>();
-
-                //config.AddSagaStateMachine
-                config.AddSagaStateMachine<OrderStateMachine, OrderState>().EntityFrameworkRepository(r =>
-                {
-                    r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // 🔒 جلوگیری از دسترسی همزمان
-
-                    /*  # migrations :
-
-                        Add-Migration InitOrderSaga -c OrderStateDbContext
-
-                        Update-Database -Context OrderStateDbContext
-
-                    */
-
-                    r.AddDbContext<DbContext, OrderStateDbContext>((provider, optionsBuilder) =>
-                    {
-                        optionsBuilder.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"],
-                                m => m.MigrationsAssembly(typeof(OrderStateDbContext).Assembly.FullName));
-                    });
-                                      
-
-                });
-
-                // فعال‌سازی Outbox
-                config.AddEntityFrameworkOutbox<OrderStateDbContext>(o =>
-                {
-                    o.QueryDelay = TimeSpan.FromSeconds(10);
-                    o.DuplicateDetectionWindow = TimeSpan.FromMinutes(1);
-                    o.UseBusOutbox(); // ✅ پیام‌ها بعد از Commit ارسال می‌شن
-                });
-
-                // Register activities (generic). Use one example type so it scans the namespace.
-                config.AddActivitiesFromNamespaceContaining<GenericOrderEventActivity<object>>();
-
-                config.UsingRabbitMq((ctx, cfg) => {
-
-                    cfg.Host(configuration["EventBusSettings:HostAddress"]);
-
-                    //cfg.UseInMemoryOutbox();
-
-                    /*cfg.ReceiveEndpoint(EventBus.Messages.Common.EventBusConstants.BasketCheckoutQueue, c =>
-                    {
-                        //c.UseConcurrencyLimit(1);
-
-                        //c.ConcurrentMessageLimit = 1;
-
-                        c.UseInMemoryOutbox();
-
-                        c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
-                        c.ConfigureConsumer<PaymentSucceededConsumer>(ctx);
-                        c.ConfigureConsumer<InventoryFailedConsumer>(ctx);
-                        c.ConfigureConsumer<PaymentFailedConsumer>(ctx);
-                        c.ConfigureConsumer<OrderCanceledConsumer>(ctx);
-                    });*/
-
-
-
-
-                    /*
-
-                    // Configure a global retry policy
-                    // --- Resilient Processing Configuration ---
-
-                    // Stage 2: For longer outages, schedule message for redelivery.
-                    // This middleware will take over after the initial retries from UseMessageRetry have failed.
-                    cfg.UseDelayedRedelivery(r =>
-                        // Configure 5 redelivery attempts with a 10-minute interval between each.
-                        //r.Interval(5, TimeSpan.FromMinutes(10)));
-                        r.Interval(5, TimeSpan.FromSeconds(3)));
-
-                    // Stage 1: For transient faults, retry the message immediately a few times.
-                    cfg.UseMessageRetry(r =>
-                        // Retry 3 times with the specified intervals between attempts.
-                        r.Intervals(
-                            TimeSpan.FromMilliseconds(500), // 1st retry after 0.5s
-                            TimeSpan.FromSeconds(5),        // 2nd retry after 5s
-                            TimeSpan.FromSeconds(10)        // 3rd retry after 10s
-                        ));
-
-                    */
-
-                    // --- End of Configuration ---
-                    cfg.ConfigureEndpoints(ctx);
-
-                });
-            });
-            //services.AddMassTransitHostedService(true);
-
-            // General Configuration
-            services.AddScoped<BasketCheckoutConsumer>();
-            services.AddScoped<ProcessEndConsumer>();
-            services.AddScoped<InventoryFailedConsumer>();
-            services.AddScoped<PaymentFailedConsumer>();
-            services.AddScoped<OrderCanceledConsumer>();
-            services.AddScoped<ProcessEndedConsumer>();
 
             #endregion
 

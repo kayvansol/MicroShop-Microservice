@@ -39,7 +39,13 @@ namespace Discount.gRPC.Repositories
 
             }
 
-            return result;
+            return result ?? new Protos.CouponModel()
+            {
+                ProductID = ProductId,
+                Amount = 0,
+                Id = 0,
+                Description = $"Not Exists any Coupon for the ProductId of number {ProductId}"
+            };
         }
     }
 }

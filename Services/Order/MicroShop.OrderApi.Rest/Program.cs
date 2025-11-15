@@ -1,6 +1,8 @@
 using MicroShop.OrderApi.Rest.Startup;
 using MicroShop.Application;
 using MicroShop.Infra.Sql.Extensions;
+using System.Configuration;
+using System.Reflection;
 
 #region Services
 
@@ -11,6 +13,8 @@ builder.Services.Register(builder.Configuration);
 builder.Services.AddInfraServicesRegister();
 
 builder.Services.AddApplicationServicesRegister();
+
+builder.Services.AddMessageBus(builder.Configuration, Assembly.GetExecutingAssembly());
 
 builder.Host.Register(builder.Configuration);
 

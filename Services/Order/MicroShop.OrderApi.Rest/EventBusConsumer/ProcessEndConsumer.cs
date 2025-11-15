@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace MicroShop.OrderApi.Rest.EventBusConsumer
 {
-    public class PaymentSucceededConsumer : IConsumer<PaymentSucceededEvent>
+    public class ProcessEndConsumer : IConsumer<ProcessEnd>
     {
-        private readonly ILogger<PaymentSucceededConsumer> _logger;
+        private readonly ILogger<ProcessEndConsumer> _logger;
         private readonly IOrderRepository repository;
         private readonly IPublishEndpoint _publishEndpoint;
 
-        public PaymentSucceededConsumer(ILogger<PaymentSucceededConsumer> logger, IOrderRepository repository, IPublishEndpoint publishEndpoint)
+        public ProcessEndConsumer(ILogger<ProcessEndConsumer> logger, IOrderRepository repository, IPublishEndpoint publishEndpoint)
         {
             
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -27,7 +27,7 @@ namespace MicroShop.OrderApi.Rest.EventBusConsumer
         }
 
 
-        public async Task Consume(ConsumeContext<PaymentSucceededEvent> context)
+        public async Task Consume(ConsumeContext<ProcessEnd> context)
         {
 
             // پرداخت شده

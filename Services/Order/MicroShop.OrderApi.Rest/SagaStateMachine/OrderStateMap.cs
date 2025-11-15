@@ -10,7 +10,7 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
         {
             entity.Property(x => x.CurrentState).HasMaxLength(64);
             entity.Property(x => x.CancelReason).HasMaxLength(256);
-            entity.HasIndex(x => x.OrderId).IsUnique(true);
+            entity.HasIndex(x => x.OrderId);//.IsUnique(true);
             entity.Property(x => x.CustomerId);
             entity.Property(x => x.Created);
         }

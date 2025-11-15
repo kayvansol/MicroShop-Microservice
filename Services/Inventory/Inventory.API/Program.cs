@@ -21,7 +21,7 @@ builder.Logging.AddConsole();
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config => {
 
-    config.AddConsumer<OrderCreateConsumer>();
+    config.AddConsumer<ProcessInventoryConsumer>();
 
     config.UsingRabbitMq((ctx, cfg) => {
 
@@ -36,7 +36,7 @@ builder.Services.AddMassTransit(config => {
 //builder.Services.AddMassTransitHostedService();
 
 // General Configuration
-builder.Services.AddScoped<OrderCreateConsumer>();
+builder.Services.AddScoped<ProcessInventoryConsumer>();
 
 #endregion
 

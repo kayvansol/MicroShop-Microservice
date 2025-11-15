@@ -1,5 +1,6 @@
 using MassTransit;
 using EventBus.Messages.Events;
+using MicroShop.OrderApi.Rest.Data;
 
 namespace MicroShop.OrderApi.Rest.SagaStateMachine
 {
@@ -7,19 +8,15 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
     public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {
 
-        public State Checkout { get; set; }
+        public State ProcessingInventory { get; set; }
 
-        public State Created { get; set; }
+        public State ProcessingPayment { get; set; }
 
-        public State InventoryReserved { get; set; }
-
-        public State Paid { get; set; }
+        public State ProcessingEnd { get; set; }
 
         public State Shipped { get; set; }
-        public State ProcessEnded { get; set; }
 
         public State Canceled { get; set; }
-
 
 
         public Event<BasketCheckoutEvent> BasketCheckoutEvent { get; set; }
@@ -38,21 +35,10 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
 
         //public Event<IOrderShipped> OrderShipped { get; private set; }
 
-
-
         public OrderStateMachine()
         {
 
             InstanceState(x => x.CurrentState);
-
-            /*
-            Event(() => OrderCreateEvent, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId).SelectId(c => Guid.NewGuid()));
-            Event(() => InventorySuccessEvent, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
-            Event(() => InventoryFailedEvent, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
-            Event(() => PaymentSucceededEvent, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
-            Event(() => PaymentFailedEvent, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
-            //Event(() => OrderShipped, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
-            */
 
             Event(() => BasketCheckoutEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
 
@@ -70,44 +56,39 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
 
             //Event(() => OrderShipped, e => e.CorrelateBy((s, c) => s.OrderId == c.Message.OrderId));
 
-            // شروع جریان کاری
-            Initially(
-                When(BasketCheckoutEvent)
-                    .Then(c =>
-                    {
-                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
-                        c.Instance.OrderId = 0;
-                        c.Instance.CustomerId = c.Data.CustomerId;
-                        c.Instance.Created = c.Data.CreationDate;
 
-                        Log.Information($"CorrelationId {c.Instance.CorrelationId} submitted by CustomerId : {c.Data.CustomerId}");
-                    })
-                    //.Publish(c => new { c.Message.OrderId, c.Message.CustomerId } as IReserveInventory) // اختیاری
-                    .TransitionTo(Checkout)
-                    .Then(c => Log.Information($"[Saga] Transitioned to Checkout for CorrelationId={c.Instance.CorrelationId}"))
-            );
+            //*******************************************************************
+
 
             // مرحله 1: ایجاد رکورد سفارش        
-            During(Checkout,
+            Initially(
                 When(OrderCreateEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.OrderId = c.Data.OrderId;
                         c.Instance.CustomerId = c.Data.CustomerId;
                         c.Instance.Created = c.Data.CreationDate;
 
-                        Log.Information($"Order {c.Data.OrderId} submitted by CustomerId : {c.Data.CustomerId}");
+                        Log.Information($"Order {c.Data.OrderId} Created by CustomerId : {c.Data.CustomerId}");
+
                     })
-                    //.Publish(c => new { c.Message.OrderId, c.Message.CustomerId } as IReserveInventory) // اختیاری
-                    .TransitionTo(Created)
-                    .Then(c => Log.Information($"[Saga] Transitioned to Created for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+                    .Activity(x => x.OfType<GenericOrderEventActivity<OrderCreateEvent>>())
+                    .PublishAsync(async c => new ProcessInventory()
+                    {
+                        OrderId = c.Message.OrderId,
+                        CustomerId = c.Message.CustomerId,
+                        CorrelationId = c.Message.CorrelationId,
+                        Created = c.Message.Created
+                    })
+                    .TransitionTo(ProcessingInventory)
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingInventory for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
             );
 
             // مرحله 2: بررسی موجودی        
-            During(Created,
+            During(ProcessingInventory,
                 When(InventorySuccessEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.OrderId = c.Data.OrderId;
@@ -116,26 +97,35 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
 
                         Log.Information($"Inventory reserved for Order {c.Data.OrderId}");
                     })
-                    //.Publish(c => new{ c.Message.OrderId,c.Message.CustomerId,c.Message.Created} as IPaymentRequest)
-                    .TransitionTo(InventoryReserved)
-                    .Then(c => Log.Information($"[Saga] Transitioned to InventoryReserved for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}")),
+                    .Activity(x => x.OfType<GenericOrderEventActivity<InventorySuccessEvent>>())
+                    .PublishAsync(async c => new ProcessPayment()
+                    {
+                        OrderId = c.Message.OrderId,
+                        CustomerId = c.Message.CustomerId,
+                        CorrelationId = c.Message.CorrelationId,
+                        Created = c.Message.Created
+                    })
+                    .TransitionTo(ProcessingPayment)
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingPayment for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}")),
 
                 When(InventoryFailedEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.CancelReason = c.Data.Reason;
                         Log.Information($"Inventory reservation failed for Order {c.Data.OrderId}: {c.Data.Reason}");
+
                     })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<InventoryFailedEvent>>())
                     //.Publish(c => new OrderCanceledEvent() { OrderId = c.Data.OrderId, Reason = c.Data.Reason })
                     .TransitionTo(Canceled)
                     .Then(c => Log.Information($"[Saga] Transitioned to Canceled for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
             );
 
             // مرحله 3: پرداخت موفق
-            During(InventoryReserved,
+            During(ProcessingPayment,
                 When(PaymentSucceededEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.OrderId = c.Data.OrderId;
@@ -143,19 +133,29 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
                         c.Instance.Created = c.Data.CreationDate;
 
                         Log.Information($"Payment done for Order {c.Data.OrderId}");
+
                     })
-                    .Then(c => Log.Information($"[Saga] Transitioned to Paid for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
-                    .TransitionTo(Paid),
-                //.Publish(c => new { c.Message.OrderId } as IShipOrder),
-                //.Finalize(),
+                    .Activity(x => x.OfType<GenericOrderEventActivity<PaymentSucceededEvent>>())
+                    .PublishAsync(async c => new ProcessEnd()
+                    {
+                        OrderId = c.Message.OrderId,
+                        CustomerId = c.Message.CustomerId,
+                        CorrelationId = c.Message.CorrelationId,
+                        Created = c.Message.Created
+                    })
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingEnd for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+                    .TransitionTo(ProcessingEnd),
+
 
                 When(PaymentFailedEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.CancelReason = c.Data.Reason;
                         Log.Information($"Payment failed for Order {c.Data.OrderId}: {c.Data.Reason}");
+
                     })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<PaymentFailedEvent>>())
                     //.Publish(c => new OrderCanceledEvent { OrderId = c.Data.OrderId, Reason = c.Data.Reason })
                     .TransitionTo(Canceled)
                     .Then(c => Log.Information($"[Saga] Transitioned to Canceled for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
@@ -163,51 +163,34 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
             );
 
             // مرحله 4: end
-            During(Paid,
+            During(ProcessingEnd,
                 When(ProcessEndedEvent)
-                    .Then(c =>
+                    .ThenAsync(async c =>
                     {
                         c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
                         c.Instance.OrderId = c.Data.OrderId;
                         //c.Instance.CustomerId = c.Data.CustomerId;
                         //c.Instance.Created = c.Data.CreationDate;
 
-                        Log.Information($"Payment done for Order {c.Data.OrderId}");
+                        Log.Information($"Ending done for Order {c.Data.OrderId}");
+
                     })
-                    .TransitionTo(ProcessEnded)
-                    .Then(c => Log.Information($"[Saga] Transitioned to Paid for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+                    .Activity(x => x.OfType<GenericOrderEventActivity<ProcessEndedEvent>>())
+                    .TransitionTo(Shipped)
+                    .Then(c => Log.Information($"[Saga] Transitioned to Shipped for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
                     //.Publish(c => new { c.Message.OrderId } as IShipOrder),
                     .Finalize()
 
             );
 
-            /*
-            // مرحله 5: ارسال کالا
-            During(Paid,
-                When(OrderShipped)
-                    .Then(c => Log.Information($"Order {c.Message.OrderId} shipped!"))
-                    .Finalize()
-            );
-            */
-
 
             // Log any unexpected incoming events for debugging
-
             DuringAny(
-                When(OrderCreateEvent)
-                    .Then(c => Log.Information($"[Saga][DuringAny] OrderCreateEvent received for OrderId={c.Data.OrderId}, CorrelationId={c.Data.CorrelationId}"))
+                When(ProcessEndedEvent)
+                    .Activity(x => x.OfType<GenericOrderEventActivity<ProcessEndedEvent>>())
+                    .Then(ctx => Console.WriteLine($"⚠️ ProcessEndedEvent received in unexpected state           {ctx.Saga.CurrentState}"))
+                  //.TransitionTo(ProcessEnded)
             );
-
-
-            DuringAny(
-                When(PaymentSucceededEvent)
-                    .Then(ctx => {
-                        Log.Information("[Saga][DuringAny] PaymentSucceededEvent received: OrderId=    {   OrderId},  CorrelationId={CorrelationId}",
-                             ctx.Data.OrderId, ctx.Data.CorrelationId);
-                        }
-                    )
-            );
-
 
             SetCompletedWhenFinalized();
 

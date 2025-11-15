@@ -4,20 +4,20 @@ using Inventory.API.Repositories;
 
 namespace Inventory.API.EventBusConsumer
 {
-    public class OrderCreateConsumer : IConsumer<OrderCreateEvent>
+    public class ProcessInventoryConsumer : IConsumer<ProcessInventory>
     {
-        private readonly ILogger<OrderCreateConsumer> _logger;
+        private readonly ILogger<ProcessInventoryConsumer> _logger;
         private readonly IInventoryRepository repository;
         public IPublishEndpoint _publishEndpoint { get; }
 
-        public OrderCreateConsumer(ILogger<OrderCreateConsumer> logger, IInventoryRepository repository, IPublishEndpoint publishEndpoint)
+        public ProcessInventoryConsumer(ILogger<ProcessInventoryConsumer> logger, IInventoryRepository repository, IPublishEndpoint publishEndpoint)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.repository = repository;
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task Consume(ConsumeContext<OrderCreateEvent> context)
+        public async Task Consume(ConsumeContext<ProcessInventory> context)
         {
 
             var IsThereEmptyInventory = await repository.IsThereEmptyInventory(context.Message.OrderId);

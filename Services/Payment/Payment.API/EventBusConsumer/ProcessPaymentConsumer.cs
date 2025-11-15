@@ -6,13 +6,13 @@ using Payment.API.Repositories.PaymentRepo;
 namespace Payment.API.EventBusConsumer
 {
 
-    public class InventorySuccessConsumer : IConsumer<InventorySuccessEvent>
+    public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
     {        
-        private readonly ILogger<InventorySuccessConsumer> _logger;
+        private readonly ILogger<ProcessPaymentConsumer> _logger;
         private readonly IPaymentRepository repository;
         public IPublishEndpoint _publishEndpoint { get; }
 
-        public InventorySuccessConsumer(ILogger<InventorySuccessConsumer> logger, IPaymentRepository repository, IPublishEndpoint publishEndpoint)
+        public ProcessPaymentConsumer(ILogger<ProcessPaymentConsumer> logger, IPaymentRepository repository, IPublishEndpoint publishEndpoint)
         {            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.repository = repository;
@@ -20,7 +20,7 @@ namespace Payment.API.EventBusConsumer
         }
 
 
-        public async Task Consume(ConsumeContext<InventorySuccessEvent> context)
+        public async Task Consume(ConsumeContext<ProcessPayment> context)
         {
 
             Entities.Payment payment = new Entities.Payment()
@@ -30,8 +30,9 @@ namespace Payment.API.EventBusConsumer
                 PaymentMethod = (short) EnumPaymentMethod.Online
             };
 
+            bool condition = true;
 
-            if (true) // Can Pay ...
+            if (condition) // Can Pay ...
             {
                 payment.Status = (short)EnumPaymentState.PaymentSucceeded;
 

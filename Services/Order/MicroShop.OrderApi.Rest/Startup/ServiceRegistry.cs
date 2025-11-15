@@ -12,6 +12,7 @@ using MicroShop.OrderApi.Rest.EventBusConsumer;
 using MicroShop.OrderApi.Rest.SagaStateMachine;
 using System.Text.Json.Serialization;
 using MassTransit.EntityFrameworkCoreIntegration;
+using MicroShop.OrderApi.Rest.Data;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -35,6 +36,23 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             #endregion
 
+            #region Event Store
+
+            services.AddDbContext<OrderEventStoreDbContext>(options =>
+                        options.UseSqlServer(configuration["ApplicationOptions:OrderEventStoreConnection"]));
+
+            services.AddScoped<IOrderEventStoreService, OrderEventStoreService>();
+
+            /*
+
+                  Add-Migration InitialOrderEventStoreMigration -c OrderEventStoreDbContext 
+                        
+                  Update-Database -Context OrderEventStoreDbContext
+
+            */
+
+            #endregion
+
             #region MassTransit
 
             services.AddDbContext<OrderStateDbContext>(options =>
@@ -48,7 +66,7 @@ namespace MicroShop.OrderApi.Rest.Startup
                 config.SetKebabCaseEndpointNameFormatter();
 
                 config.AddConsumer<BasketCheckoutConsumer>();
-                config.AddConsumer<PaymentSucceededConsumer>();
+                config.AddConsumer<ProcessEndConsumer>();
                 config.AddConsumer<InventoryFailedConsumer>();
                 config.AddConsumer<PaymentFailedConsumer>();
                 config.AddConsumer<OrderCanceledConsumer>();
@@ -69,8 +87,10 @@ namespace MicroShop.OrderApi.Rest.Startup
 
                     r.AddDbContext<DbContext, OrderStateDbContext>((provider, optionsBuilder) =>
                     {
-                        optionsBuilder.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"]);
+                        optionsBuilder.UseSqlServer(configuration["ApplicationOptions:StoreConnectionString"],
+                                m => m.MigrationsAssembly(typeof(OrderStateDbContext).Assembly.FullName));
                     });
+                                      
 
                 });
 
@@ -81,6 +101,9 @@ namespace MicroShop.OrderApi.Rest.Startup
                     o.DuplicateDetectionWindow = TimeSpan.FromMinutes(1);
                     o.UseBusOutbox(); // ✅ پیام‌ها بعد از Commit ارسال می‌شن
                 });
+
+                // Register activities (generic). Use one example type so it scans the namespace.
+                config.AddActivitiesFromNamespaceContaining<GenericOrderEventActivity<object>>();
 
                 config.UsingRabbitMq((ctx, cfg) => {
 
@@ -138,7 +161,7 @@ namespace MicroShop.OrderApi.Rest.Startup
 
             // General Configuration
             services.AddScoped<BasketCheckoutConsumer>();
-            services.AddScoped<PaymentSucceededConsumer>();
+            services.AddScoped<ProcessEndConsumer>();
             services.AddScoped<InventoryFailedConsumer>();
             services.AddScoped<PaymentFailedConsumer>();
             services.AddScoped<OrderCanceledConsumer>();
@@ -251,9 +274,7 @@ namespace MicroShop.OrderApi.Rest.Startup
                 options.OperationFilter<AuthorizeCheckOperationFilter>();
             });
 
-            #endregion
-
-            
+            #endregion          
 
         }
 

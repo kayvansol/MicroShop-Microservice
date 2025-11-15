@@ -33,7 +33,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config => {
 
-    config.AddConsumer<InventorySuccessConsumer>();
+    config.AddConsumer<ProcessPaymentConsumer>();
 
     config.UsingRabbitMq((ctx, cfg) => {
 
@@ -48,7 +48,7 @@ builder.Services.AddMassTransit(config => {
 //builder.Services.AddMassTransitHostedService();
 
 // General Configuration
-builder.Services.AddScoped<InventorySuccessConsumer>();
+builder.Services.AddScoped<ProcessPaymentConsumer>();
 
 #endregion
 

@@ -1,0 +1,54 @@
+﻿
+POST : http://localhost:8000/orders/InsertOrder
+
+********************************************************
+
+POST : http://localhost:8000/basket
+
+{
+  "customerId": 4,
+  "items": [
+    {
+      "productId": "4",
+      "productName": "nokia lumia 1020",
+      "quantity": 10,
+      "price": 1456660,
+      "discount": 0
+    },
+	{
+      "productId": "2",
+      "productName": "Sumsung galaxy A32",
+      "quantity": 5,
+      "price": 150000,
+      "discount": 0
+    }
+  ]
+}
+
+********************************************************
+
+POST : http://localhost:8000/basket/Checkout
+
+{
+  "customerId": 4
+}
+
+result ---> "correlationId" کد رهگیری دریافتی
+
+********************************************************
+
+POST : http://localhost:8000/orderpayment
+
+{
+  "correlationId": "",
+  "creationDate": "2025-11-16T19:34:50.079Z",
+  "orderId": 0,
+  "customerId": 0,
+  "created": "2025-11-16T19:34:50.079Z"
+}
+
+correlationId : کد رهگیری دریافتی مرحله قبل و نیز نشان داده شده در لیست سفارشات منتظر پرداخت
+
+orderId : شماره ثبت سفارش که در گرید لیست سفارشات در حال منتظر پرداخت برای هر سفارش ثبت شده است
+
+********************************************************

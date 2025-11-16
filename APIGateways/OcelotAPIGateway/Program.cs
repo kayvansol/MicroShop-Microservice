@@ -1,11 +1,38 @@
+using Ocelot.Provider.Polly;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// load ocelot.json
+builder.Configuration.AddJsonFile("ocelot.Development.json", optional: false, reloadOnChange: true);
+
+// register DelegatingHandler
+builder.Services.AddTransient<CorrelationIdDelegatingHandler>();
+
+// register Ocelot
+builder.Services.AddOcelot(builder.Configuration).AddPolly();
+
+// optional: add IHttpContextAccessor if you want to read context in handlers
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", context => context.Response.WriteAsync("API Gateway running"));
+});
+
+// very important: run Ocelot middleware
+await app.UseOcelot();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -103,13 +103,14 @@ namespace Basket.API.Controllers
             await _publishEndpoint.Publish(eventMessage);
             */
 
+            Guid correlationId = Guid.NewGuid();
 
             await _publishEndpoint.Publish(new BasketCheckoutEvent
             {                
                 BasketItems = JsonConvert.SerializeObject(basket.Items), // Products List
                 TotalPrice = basket.TotalPrice,
                 CustomerId = basket.CustomerId,
-                CorrelationId = Guid.NewGuid(),
+                CorrelationId = correlationId,
                 OrderId = 0
             });
 
@@ -122,7 +123,7 @@ namespace Basket.API.Controllers
 
             //Thread.Sleep(5000); 
 
-            return Accepted(status);
+            return Accepted(correlationId);
         }
 
 

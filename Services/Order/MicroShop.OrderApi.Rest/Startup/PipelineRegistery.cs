@@ -45,8 +45,10 @@ namespace MicroShop.OrderApi.Rest.Startup
             });
 
             #endregion
-            
+
             //webApplication.UseHttpsRedirection();
+
+            webApplication.UseCors("AllowAll");
         }
     }
 }

@@ -31,8 +31,7 @@ namespace MicroShop.OrderApi.Rest.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_OrderState_OrderId",
                 table: "OrderState",
-                column: "OrderId",
-                unique: true);
+                column: "OrderId");
         }
 
         /// <inheritdoc />

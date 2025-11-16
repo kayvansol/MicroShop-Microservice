@@ -70,6 +70,8 @@ namespace MicroShop.OrderApi.Rest.Startup
 
                 });
 
+                // خطوط زیر به دلیل پابلیش نشدن پیام در کنترلر پرداخت بعد از اینکه مرحله پرداخت به بعد به دکمه ی پرداخت انتقال یافت یعنی از حالت پردازش خودکار توسط ماشین استیت به حالت دستی
+                /*
                 // فعال‌سازی Outbox
                 config.AddEntityFrameworkOutbox<OrderStateDbContext>(o =>
                 {
@@ -77,6 +79,8 @@ namespace MicroShop.OrderApi.Rest.Startup
                     o.DuplicateDetectionWindow = TimeSpan.FromMinutes(1);
                     o.UseBusOutbox(); // ✅ پیام‌ها بعد از Commit ارسال می‌شن
                 });
+                */
+
 
                 // Register activities (generic). Use one example type so it scans the namespace.
                 config.AddActivitiesFromNamespaceContaining<GenericOrderEventActivity<object>>();

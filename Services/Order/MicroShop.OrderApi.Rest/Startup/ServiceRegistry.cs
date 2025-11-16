@@ -17,11 +17,23 @@ namespace MicroShop.OrderApi.Rest.Startup
         {
 
             #region Public
-
+            /*
             services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 80;
             });
+            */
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
 
             services.AddControllers().AddJsonOptions(options =>
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;

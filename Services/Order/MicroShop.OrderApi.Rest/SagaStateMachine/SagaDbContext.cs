@@ -13,7 +13,13 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
 
         protected override IEnumerable<ISagaClassMap> Configurations
         {
-            get { yield return new OrderStateMap(); }
+            get 
+            { 
+                yield return new OrderStateMap();
+                
+            }
         }
+              
+
     }
 }

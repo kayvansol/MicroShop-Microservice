@@ -98,13 +98,14 @@ namespace MicroShop.OrderApi.Rest.SagaStateMachine
                         Log.Information($"Inventory reserved for Order {c.Data.OrderId}");
                     })
                     .Activity(x => x.OfType<GenericOrderEventActivity<InventorySuccessEvent>>())
-                    .PublishAsync(async c => new ProcessPayment()
+                    // انتقال مرحله پرداخت خودکار به دستی و توسط دکمه پرداخت
+                    /*.PublishAsync(async c => new ProcessPayment()
                     {
                         OrderId = c.Message.OrderId,
                         CustomerId = c.Message.CustomerId,
                         CorrelationId = c.Message.CorrelationId,
                         Created = c.Message.Created
-                    })
+                    })*/
                     .TransitionTo(ProcessingPayment)
                     .Then(c => Log.Information($"[Saga] Transitioned to ProcessingPayment for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}")),
 

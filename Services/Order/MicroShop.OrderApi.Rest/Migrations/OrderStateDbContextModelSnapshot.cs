@@ -50,8 +50,7 @@ namespace MicroShop.OrderApi.Rest.Migrations
 
                     b.HasKey("CorrelationId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderState");
                 });

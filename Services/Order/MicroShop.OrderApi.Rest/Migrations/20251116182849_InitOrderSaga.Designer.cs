@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroShop.OrderApi.Rest.Migrations
 {
     [DbContext(typeof(OrderStateDbContext))]
-    [Migration("20251112210107_InitOrderSaga")]
+    [Migration("20251116182849_InitOrderSaga")]
     partial class InitOrderSaga
     {
         /// <inheritdoc />
@@ -53,8 +53,7 @@ namespace MicroShop.OrderApi.Rest.Migrations
 
                     b.HasKey("CorrelationId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderState");
                 });

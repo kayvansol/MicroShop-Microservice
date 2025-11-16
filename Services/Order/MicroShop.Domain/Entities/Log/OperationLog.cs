@@ -1,0 +1,15 @@
+﻿
+namespace MicroShop.Domain.Log;
+
+public partial class OperationLog: BaseEntity<int>
+{
+    public int Id { get; set; }
+
+    public DateTime? CreateDateTime { get; set; }
+
+    public string? Parameters { get; set; }
+
+    public string? Answer { get; set; }
+
+    public long? ExecuteTime { get; set; }
+}

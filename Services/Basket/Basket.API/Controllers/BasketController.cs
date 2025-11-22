@@ -79,12 +79,10 @@ namespace Basket.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Checkout([FromBody] BasketCheckout basketCheckout)
         {
-            // get existing basket with total price 
-            // Create basketCheckoutEvent -- Set TotalPrice on basketCheckout eventMessage
-            // send checkout event to rabbitmq
-            // remove the basket
-
-            // get existing basket with total price
+            // get existing basket with related total price 
+            // Create basket Checkout Event & Set TotalPrice on basketCheckout event Message
+            // send checkout event to the queue
+            // remove the basket content
 
             var basket = await _repository.GetBasket(basketCheckout.CustomerId);
             if (basket == null)
@@ -92,16 +90,7 @@ namespace Basket.API.Controllers
                 return BadRequest();
             }
 
-
             // send checkout event to rabbitmq
-
-            /*
-            var eventMessage = _mapper.Map<BasketCheckoutEvent>(basketCheckout);
-            eventMessage.TotalPrice = basket.TotalPrice;
-            eventMessage.BasketItems = ""; // JsonConvert.SerializeObject(basket.Items);// Products List
-            
-            await _publishEndpoint.Publish(eventMessage);
-            */
 
             Guid correlationId = Guid.NewGuid();
 
@@ -114,14 +103,8 @@ namespace Basket.API.Controllers
                 OrderId = 0
             });
 
-
             // remove the basket
-
             bool status = await _repository.DeleteBasket(basket.CustomerId);
-
-            //Note : this is for ensuring that message delivered to the queue ...
-
-            //Thread.Sleep(5000); 
 
             return Accepted(correlationId);
         }

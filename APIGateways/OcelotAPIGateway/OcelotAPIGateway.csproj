@@ -15,6 +15,9 @@
     <PackageReference Include="Ocelot" Version="24.0.1" />
     <PackageReference Include="Ocelot.Provider.Polly" Version="24.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageReference Include="Steeltoe.Discovery.ClientCore" Version="3.2.8" />
+    <PackageReference Include="Steeltoe.Discovery.Consul" Version="3.2.8" />
+    <PackageReference Include="Ocelot.Provider.Consul" Version="24.0.0" />
   </ItemGroup>
 
 </Project>

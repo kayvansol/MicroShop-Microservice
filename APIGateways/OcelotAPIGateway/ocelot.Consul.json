@@ -1,0 +1,180 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/Order/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "order-service",
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/orders/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "Key": "OrderService",
+      "Priority": 1,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "HttpHandlerOptions": { "AllowAutoRedirect": false },
+
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 5000,
+        "TimeoutValue": 10000
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ],
+
+      "AddHeadersToRequest": {
+        "X-Requested-From": "ApiGateway"
+      },
+      "UpstreamHeaderTransform": {
+        "X-Real-IP": "true"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/Payment/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "order-service", // هدایت به OrderApi
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/orderpayment/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "OrderPaymentService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/v1/Basket/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "basket-service",
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/basket/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "BasketService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/inventory/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "inventory-service",
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/inventory/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "Key": "InventoryService",
+      "Priority": 1,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/payment/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "payment-service",
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/payment/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "Key": "PaymentService",
+      "Priority": 1,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/Coupon/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "discount-service",
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/discount/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "DiscountService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "RequestIdKey": "X-Correlation-Id",
+    "BaseUrl": "http://localhost:8000",
+
+    "ServiceDiscoveryProvider": {
+      "Host": "Consul1",
+      "Port": 8500,
+      "Type": "Consul",
+      "Scheme": "http"
+    }
+  }
+}

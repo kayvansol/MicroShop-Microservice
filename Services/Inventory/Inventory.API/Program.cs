@@ -1,8 +1,19 @@
 using Inventory.API.EventBusConsumer;
 using Inventory.API.Repositories;
 using MassTransit;
+using Steeltoe.Discovery.Client;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5104, o =>
+    {
+        o.Protocols = HttpProtocols.Http1AndHttp2;   // گارانتی قطعی
+        //o.UseHttps();
+    });
+});
 
 // Add services to the container.
 
@@ -33,13 +44,14 @@ builder.Services.AddMassTransit(config => {
 
     });
 });
-//builder.Services.AddMassTransitHostedService();
 
 // General Configuration
 builder.Services.AddScoped<ProcessInventoryConsumer>();
 
 #endregion
 
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -53,5 +65,11 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+// HealthCheck endpoint for Consul
+app.MapHealthChecks("/health");
+
+// Register to Consul
+app.UseDiscoveryClient();
 
 app.Run();

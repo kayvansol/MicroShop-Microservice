@@ -1,0 +1,49 @@
+
+
+
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
+
+
+
+
+// HealthCheck endpoint for Consul
+app.MapHealthChecks("/health");
+
+// Register to Consul
+app.UseDiscoveryClient();
+
+
+
+,
+  "spring": {
+    "application": {
+      "name": "basket-service"
+    }
+  },
+  "steeltoe": {
+    "client": {
+      "consul": {
+        "discovery": {
+          "host": "192.168.56.164",
+          "port": 8500,
+          "scheme": "http",
+
+          "register": true,
+          "serviceName": "basket-service",
+
+          "healthCheckPath": "/health",
+          "healthCheckInterval": "10s",
+
+          "serviceHost": "192.168.56.165",
+          "servicePort": 5292,
+
+          "useNetUtils": false
+        }
+      }
+    }
+  }
+
+
+
+scp MicroShopSln.zip kayvan@192.168.56.165:~/Desktop/Projects

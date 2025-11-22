@@ -63,8 +63,6 @@ namespace Payment.API.EventBusConsumer
 
             }
 
-            //Thread.Sleep(5000);
-
         }
     }
 }

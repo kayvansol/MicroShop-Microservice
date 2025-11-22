@@ -7,6 +7,7 @@ using MicroShop.OrderApi.Rest.Mapper;
 using MicroShop.Infra.Sql.Context;
 using MassTransit;
 using System.Text.Json.Serialization;
+using Steeltoe.Discovery.Client;
 //using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace MicroShop.OrderApi.Rest.Startup
@@ -23,6 +24,10 @@ namespace MicroShop.OrderApi.Rest.Startup
                 options.HttpsPort = 80;
             });
             */
+
+
+            services.AddDiscoveryClient(configuration);
+            services.AddHealthChecks();
 
             services.AddCors(options =>
             {

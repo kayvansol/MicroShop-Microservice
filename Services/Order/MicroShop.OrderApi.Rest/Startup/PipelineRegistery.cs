@@ -1,5 +1,6 @@
 ﻿using MicroShop.OrderApi.Rest.Middlewares;
 using MicroShop.OrderApi.Rest.Services;
+using Steeltoe.Discovery.Client;
 
 namespace MicroShop.OrderApi.Rest.Startup
 {
@@ -49,6 +50,14 @@ namespace MicroShop.OrderApi.Rest.Startup
             //webApplication.UseHttpsRedirection();
 
             webApplication.UseCors("AllowAll");
+
+            // HealthCheck endpoint for Consul
+            webApplication.MapHealthChecks("/health");
+            
+            // Register to Consul
+            webApplication.UseDiscoveryClient();
+
+            
         }
     }
 }

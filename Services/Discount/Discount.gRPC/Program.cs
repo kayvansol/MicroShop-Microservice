@@ -1,9 +1,22 @@
-using Discount.gRPC.Services;
+﻿using Discount.gRPC.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Steeltoe.Discovery.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5046, o =>
+    {
+        o.Protocols = HttpProtocols.Http2;   // گارانتی قطعی
+    });
+});
+
 // Add services to the container.
 builder.Services.AddGrpc();
+
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -24,5 +37,11 @@ app.UseEndpoints(endpoints =>
     });*/
 
 });
+
+// HealthCheck endpoint for Consul
+app.MapHealthChecks("/health");
+
+// Register to Consul
+app.UseDiscoveryClient();
 
 app.Run();

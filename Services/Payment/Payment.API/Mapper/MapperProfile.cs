@@ -8,10 +8,7 @@ namespace Payment.API.Mapper
     {
         public MapperProfile()
         {
-
             
-            //CreateMap<AddOrderCommandDto, Order>();
-
         }
     }
 }

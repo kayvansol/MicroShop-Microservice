@@ -6,8 +6,19 @@ using Payment.API.EventBusConsumer;
 using Payment.API.Mapper;
 using Payment.API.Repositories;
 using Payment.API.Repositories.PaymentRepo;
+using Steeltoe.Discovery.Client;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5123, o =>
+    {
+        o.Protocols = HttpProtocols.Http1AndHttp2;   // گارانتی قطعی
+        //o.UseHttps();
+    });
+});
 
 // Add services to the container.
 
@@ -65,6 +76,9 @@ IMapper mapper = mapperConfig.CreateMapper();
 
 builder.Services.AddSingleton(mapper);
 
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
+
 #endregion
 
 var app = builder.Build();
@@ -79,5 +93,11 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+// HealthCheck endpoint for Consul
+app.MapHealthChecks("/health");
+
+// Register to Consul
+app.UseDiscoveryClient();
 
 app.Run();

@@ -3,10 +3,24 @@ using MicroShop.Application;
 using MicroShop.Infra.Sql.Extensions;
 using System.Configuration;
 using System.Reflection;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 #region Services
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region Kestrel Config
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5180, o =>
+    {
+        o.Protocols = HttpProtocols.Http1AndHttp2;   // گارانتی قطعی
+        //o.UseHttps();
+    });
+});
+
+#endregion
 
 builder.Services.Register(builder.Configuration);
 

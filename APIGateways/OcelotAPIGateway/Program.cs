@@ -1,17 +1,19 @@
 using Ocelot.Provider.Polly;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Consul;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // load ocelot.json
-builder.Configuration.AddJsonFile("ocelot.Development.json", optional: false, reloadOnChange: true);
+//builder.Configuration.AddJsonFile("ocelot.Development.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile("ocelot.Consul.json", optional: false, reloadOnChange: true);
 
 // register DelegatingHandler
 builder.Services.AddTransient<CorrelationIdDelegatingHandler>();
 
 // register Ocelot
-builder.Services.AddOcelot(builder.Configuration).AddPolly();
+builder.Services.AddOcelot(builder.Configuration).AddPolly().AddConsul();
 
 // optional: add IHttpContextAccessor if you want to read context in handlers
 builder.Services.AddHttpContextAccessor();

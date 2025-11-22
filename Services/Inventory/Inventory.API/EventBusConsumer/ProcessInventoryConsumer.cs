@@ -32,9 +32,6 @@ namespace Inventory.API.EventBusConsumer
                     Reason = "Item out of stock"
                 });
 
-
-                //Thread.Sleep(5000);
-
             }
             else
             {
@@ -47,12 +44,8 @@ namespace Inventory.API.EventBusConsumer
                     Created = context.Message.Created
                 });
 
-
-                //Thread.Sleep(5000);
-
             }
 
-            //return Task.CompletedTask;
         }
     }
 }

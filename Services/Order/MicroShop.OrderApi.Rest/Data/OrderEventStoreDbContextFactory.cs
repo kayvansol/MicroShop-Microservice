@@ -17,7 +17,7 @@ namespace MicroShop.OrderApi.Rest.Data
 
             var optionsBuilder = new DbContextOptionsBuilder<OrderEventStoreDbContext>();
             var cs = configuration.GetConnectionString("OrderEventStoreConnection")
-                     ?? "Server=localhost;Database=OrderEventStoreDb;Trusted_Connection=True;TrustServerCertificate=True";
+                     ?? "Server=192.168.1.4;Database=OrderEventStoreDb;User ID=sa;Password=ABCabc123456;Trusted_Connection=True;TrustServerCertificate=True";
             optionsBuilder.UseSqlServer(cs);
 
             return new OrderEventStoreDbContext(optionsBuilder.Options);

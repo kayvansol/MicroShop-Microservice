@@ -18,7 +18,7 @@ public partial class MicroShopDiscountContext : DbContext
     public virtual DbSet<Coupon> Coupons { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=MicroShopDiscount;Integrated Security=True;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Data Source=192.168.1.4;Initial Catalog=MicroShopDiscount;User ID=sa;Password=ABCabc123456;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=True;Encrypt=False;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

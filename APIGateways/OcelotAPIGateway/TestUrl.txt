@@ -1,4 +1,6 @@
 ﻿
+Note: localhost Or Consul2 (192.168.56.165) ---> (Consul Agent Client Node's HostName that OcelotAPIGateway has hosted on it with port 8000)
+
 POST : http://localhost:8000/orders/InsertOrder
 
 ********************************************************

@@ -1,18 +1,20 @@
 # .Net 8.0 Microservice Project
 <br />
+
 **Microservices** architecture, or simply microservices, comprises a set of focused, independent, autonomous services that make up a larger business application. The architecture provides a framework for independently writing, updating, and deploying services without disrupting the overall functionality of the application. Within this architecture, every single service within the microservices architecture is self-contained and implements a specific business function. For example, building an e-commerce application involves processing orders, updating customer details, and calculating net prices. The app will utilize various microservices, each designed to handle specific functions, working together to achieve the overall business objectives.
 
 <br />
+
 <img src='img/Microservices-Architecture.png' />
-<br /><br />
+
+<br />
 
 Adopting a microservices architecture brings a range of benefits that can transform how organizations build and operate software. One of the primary advantages is the ability to scale individual services independently, which helps optimize resource usage and eliminates bottlenecks that can affect the entire application. This independent scalability also means that development teams can deploy services independently, reducing the risk of system-wide outages and enabling continuous delivery of new features. Deployments can be performed with one service at a time or span multiple services, depending on the specific needs of the deployment.
-<br /><br />
 
-## ✅ Whats Including In This Repository
+## 🗃️ Whats Including In This Repository
 I have implemented below features.
 
-#### Order microservice which includes; 
+#### Order microservice which includes
 * NET 8.0 Web API application 
 * REST API principles, CRUD operations
 * **SQL Server database (MicroShop)** connection
@@ -20,22 +22,27 @@ I have implemented below features.
 * Swagger Open API implementation
 * Consume Events (BasketCheckoutConsumer)	
 * Publish OrderCreateEvent event with using **MassTransit and RabbitMQ**
+* Implementing **DDD, CQRS, and Clean Architecture** with using Best Practices
+* Developing **CQRS with using MediatR, FluentValidation and AutoMapper packages**
+* Consuming **RabbitMQ** BasketCheckout Event Queue with using **MassTransit-RabbitMQ** Configuration
+* **SQL Server Database** connection
+* Using **Entity Framework Core ORM** and migratation to SQL Server Manually.
 
-#### Basket microservice which includes;
-* NET 8.0 Web API application
-* REST API principles, CRUD operations
-* **Redis database** connection
-* Consume Discount **Grpc Service** for inter-service sync communication to calculate product final price
-* Publish BasketCheckout event with using **MassTransit and RabbitMQ**
-  
-#### Discount microservice which includes;
+#### Discount microservice which includes
 * NET 8.0 **Grpc Server** application
 * Build a Highly Performant **inter-service gRPC Communication** with Basket Microservice
 * Exposing Grpc Services with creating **Protobuf messages**
 * Using **ADO.Net implementation** to simplify data access and ensure high performance
 * **SQL Server database (MicroShopDiscount)** connection
 
-#### Inventory microservice which includes; 
+#### Basket microservice which includes
+* NET 8.0 Web API application
+* REST API principles, CRUD operations
+* **Redis database** connection
+* Consume Discount **Grpc Service** for inter-service sync communication to calculate product final price
+* Publish BasketCheckout event with using **MassTransit and RabbitMQ**
+
+#### Inventory microservice which includes
 * NET 8.0 Web API application 
 * Consume Events (ProcessInventoryConsumer)
 * **SQL Server database (MicroShop)** connection
@@ -43,33 +50,26 @@ I have implemented below features.
 * Swagger Open API implementation	
 * Publish InventorySuccessEvent event with using **MassTransit and RabbitMQ**
 
-#### Payment microservice which includes; 
+#### Payment microservice which includes 
 * NET 8.0 Web API application 
 * Consume Events (ProcessPaymentConsumer)
 * **SQL Server database (MicroShopPayment)** connection
 * Repository Pattern Implementation
 * Swagger Open API implementation	
 * Publish PaymentSucceededEvent event with using **MassTransit and RabbitMQ**
-
-#### Microservices Communication
-* Sync inter-service **gRPC Communication**
-* Async Microservices Communication with **RabbitMQ Message-Broker Service**
-* Using **RabbitMQ Publish/Subscribe Topic** Exchange Model
-* Using **MassTransit** for abstraction over RabbitMQ Message-Broker system
-* Publishing BasketCheckout event queue from Basket microservices and Subscribing this event from Ordering microservices (BasketCheckoutConsumer) and the rest of the ordering flow with Masstransit saga State Machine  (MassTransitStateMachine : OrderStateMachine)
-* Create **RabbitMQ EventBus.Messages library** and add references Microservices
-
-#### Ordering Microservice
-* Implementing **DDD, CQRS, and Clean Architecture** with using Best Practices
-* Developing **CQRS with using MediatR, FluentValidation and AutoMapper packages**
-* Consuming **RabbitMQ** BasketCheckout event queue with using **MassTransit-RabbitMQ** Configuration
-* **SQL Server database** connection
-* Using **Entity Framework Core ORM** and migratation to SQL Server Manually.
 	
 #### API Gateway Ocelot Microservice
 * Implement **API Gateways with Ocelot**
 * Sample microservices/Consul to reroute through the API Gateway	
 * The Gateway aggregation pattern in MicroShop.Aggregator
+
+#### Microservices Communications
+* Sync inter-service **gRPC Communication**
+* Async Microservices Communication with **RabbitMQ Message-Broker Service**
+* Using **RabbitMQ Publish/Subscribe Topic** Exchange Model
+* Using **MassTransit** for abstraction over RabbitMQ Message-Broker system
+* Publishing BasketCheckout event queue from Basket microservices and Subscribing this event from Ordering microservices (BasketCheckoutConsumer) and the rest of the ordering flow with **Masstransit Saga State Machine**  (MassTransitStateMachine : OrderStateMachine)
+* Create **RabbitMQ EventBus.Messages library** and add references Microservices
 
 #### Microservices Cross-Cutting Implementations
 * Implementing **Centralized Logging with SeriLog** for Microservices
@@ -84,23 +84,200 @@ I have implemented below features.
 * **Register** each service to mentioned Consul nodes with Hostnames
 * Using **Steeltoe** library to register and resolve the services
 
-<br />
 
-# 🎨 State Diagram
+## 🎨 State Diagram
 #### Ordering flow with Masstransit Saga State Machine (OrderStateMachine)
 
 **Transitions** between these states are triggered by user actions or system processes (Saga), providing a clear overview of the customer journey from initial product search to final purchase and order confirmation.
 
-<img src="img/state.jpg" style="width:70%;"  />
+<img src="img/state.png" style="width:70%;"  />
 
-<br />
+
+### 📜 OrderStateMachine Class (MassTransit Saga State Machine) :
+
+```
+public class OrderStateMachine : MassTransitStateMachine<OrderState>
+    {
+
+        public State ProcessingInventory { get; set; }
+
+        public State ProcessingPayment { get; set; }
+
+        public State ProcessingEnd { get; set; }
+
+        public State Canceled { get; set; }
+
+
+        public Event<BasketCheckoutEvent> BasketCheckoutEvent { get; set; }
+
+        public Event<OrderCreateEvent> OrderCreateEvent { get; set; }
+
+        public Event<InventorySuccessEvent> InventorySuccessEvent { get; set; }
+
+        public Event<InventoryFailedEvent> InventoryFailedEvent { get; set; }
+
+        public Event<PaymentSucceededEvent> PaymentSucceededEvent { get; set; }
+
+        public Event<PaymentFailedEvent> PaymentFailedEvent { get; set; }
+
+        public Event<ProcessEndedEvent> ProcessEndedEvent { get; set; }
+
+
+        public OrderStateMachine()
+        {
+
+            InstanceState(x => x.CurrentState);
+
+            Event(() => BasketCheckoutEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => OrderCreateEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => InventorySuccessEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => InventoryFailedEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => PaymentSucceededEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => PaymentFailedEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            Event(() => ProcessEndedEvent, e => e.CorrelateBy((s, c) => s.CorrelationId == c.Message.CorrelationId));
+
+            //*******************************************************************
+
+            // مرحله 1: ایجاد رکورد سفارش        
+            Initially(
+                When(OrderCreateEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.OrderId = c.Data.OrderId;
+                        c.Instance.CustomerId = c.Data.CustomerId;
+                        c.Instance.Created = c.Data.CreationDate;
+
+                        Log.Information($"Order {c.Data.OrderId} Created by CustomerId : {c.Data.CustomerId}");
+
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<OrderCreateEvent>>())
+                    .PublishAsync(async c => new ProcessInventory()
+                    {
+                        OrderId = c.Message.OrderId,
+                        CustomerId = c.Message.CustomerId,
+                        CorrelationId = c.Message.CorrelationId,
+                        Created = c.Message.Created
+                    })
+                    .TransitionTo(ProcessingInventory)
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingInventory for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+            );
+
+            // مرحله 2: بررسی موجودی        
+            During(ProcessingInventory,
+                When(InventorySuccessEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.OrderId = c.Data.OrderId;
+                        c.Instance.CustomerId = c.Data.CustomerId;
+                        c.Instance.Created = c.Data.CreationDate;
+
+                        Log.Information($"Inventory reserved for Order {c.Data.OrderId}");
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<InventorySuccessEvent>>())
+                    // انتقال مرحله پرداخت خودکار به دستی و توسط دکمه پرداخت
+                    .TransitionTo(ProcessingPayment)
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingPayment for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}")),
+
+                When(InventoryFailedEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.CancelReason = c.Data.Reason;
+                        Log.Information($"Inventory reservation failed for Order {c.Data.OrderId}: {c.Data.Reason}");
+
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<InventoryFailedEvent>>())
+                    .TransitionTo(Canceled)
+                    .Then(c => Log.Information($"[Saga] Transitioned to Canceled for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+            );
+
+            // مرحله 3: پرداخت موفق
+            During(ProcessingPayment,
+                When(PaymentSucceededEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.OrderId = c.Data.OrderId;
+                        c.Instance.CustomerId = c.Data.CustomerId;
+                        c.Instance.Created = c.Data.CreationDate;
+
+                        Log.Information($"Payment done for Order {c.Data.OrderId}");
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<PaymentSucceededEvent>>())
+                    .PublishAsync(async c => new ProcessEnd()
+                    {
+                        OrderId = c.Message.OrderId,
+                        CustomerId = c.Message.CustomerId,
+                        CorrelationId = c.Message.CorrelationId,
+                        Created = c.Message.Created
+                    })
+                    .Then(c => Log.Information($"[Saga] Transitioned to ProcessingEnd for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+                    .TransitionTo(ProcessingEnd),
+
+
+                When(PaymentFailedEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.CancelReason = c.Data.Reason;
+                        Log.Information($"Payment failed for Order {c.Data.OrderId}: {c.Data.Reason}");
+
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<PaymentFailedEvent>>())
+                    .TransitionTo(Canceled)
+                    .Then(c => Log.Information($"[Saga] Transitioned to Canceled for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))
+
+            );
+
+            // مرحله 4: end
+            During(ProcessingEnd,
+                When(ProcessEndedEvent)
+                    .ThenAsync(async c =>
+                    {
+                        c.Instance.CorrelationId = c.Data.CorrelationId; // CorrelationId
+                        c.Instance.OrderId = c.Data.OrderId;
+                        
+                        Log.Information($"Ending done for Order {c.Data.OrderId}");
+
+                    })
+                    .Activity(x => x.OfType<GenericOrderEventActivity<ProcessEndedEvent>>())
+                    .TransitionTo(Shipped)
+                    .Then(c => Log.Information($"[Saga] Transitioned to Shipped for OrderId={c.Instance.OrderId}, CorrelationId={c.Instance.CorrelationId}"))                    
+                    .Finalize()
+
+            );
+
+
+            // Log any unexpected incoming events for debugging
+            DuringAny(
+                When(ProcessEndedEvent)
+                    .Activity(x => x.OfType<GenericOrderEventActivity<ProcessEndedEvent>>())
+                    .Then(ctx => Console.WriteLine($"⚠️ ProcessEndedEvent received in unexpected state {ctx.Saga.CurrentState}"))                  
+            );
+
+            SetCompletedWhenFinalized();
+
+            Log.Information("✅ OrderStateMachine constructor called");
+
+        }
+    }
+```
+
 
 ## 📦 Domain-Driven Design — Order Service
 
 Order.API is an independent Bounded Context in the microservices architecture responsible for managing the complete lifecycle of an order.
 It contains the core business logic for order creation, validation, inventory reservation, discount calculation, and payment initiation.
 
-## 🧩 Core Domain
+### 🧩 Core Domain
 
 #### Order Aggregate
 
@@ -110,9 +287,9 @@ It contains the core business logic for order creation, validation, inventory re
 
 * Contains order items (OrderItems)
 
-* EnumOrderState → Value Object / Domain Enum
+* EnumOrderState → Domain Enum
 
-* Event Bus Consumers → Domain Event Handler / Integration Event Handler
+* Event Bus Consumers → Domain Event Handler
 
 * Enforces domain rules such as:
 
@@ -120,9 +297,9 @@ It contains the core business logic for order creation, validation, inventory re
 
    * Validating order status
 
-   * Managing state transitions (Pending → Paid → Completed → Cancelled)
+   * Managing state transitions (ProcessingInventory → ProcessingPayment → ProcessingEnd → Canceled)
 
-## 📚 Application Layer
+### 📚 Application Layer
 
 * Implements CQRS
 
@@ -134,7 +311,7 @@ It contains the core business logic for order creation, validation, inventory re
 
 * Coordinates domain logic with external services
 
-## 🏛  Infrastructure Layer
+### 🏛  Infrastructure Layer
 
 * Implements Repository pattern in alignment with DDD
 
@@ -165,16 +342,15 @@ It contains the core business logic for order creation, validation, inventory re
 
 * Validating discount information via Discount service
 
-* Reserving stock through Inventory service
+* Check stock through Inventory service
 
 * Initiating payment via Payment service
 
 * Managing the full lifecycle of an order and its domain events
 
-<br />
 
-# 🎉 Databases Migrations
-#### Entity Framework's Migrations & Migrations Scaffolding :
+## 🎉 Databases Migrations
+#### Entity Framework's Migrations & Scaffolding :
 ```
 Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShop;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Context -Force
 ```
@@ -193,19 +369,18 @@ Add-Migration InitialOrderEventStoreMigration -c OrderEventStoreDbContext
 Update-Database -Context OrderEventStoreDbContext
 ```
 
-#### 📌 Databases :
+#### 🛢️ Databases :
 
 <img src="img/DataBases.png" />
 
-<br /><br />
+<br />
 
-# 🚀 Project Structure :
+## 🚀 Solution Structure :
 
 <img src="img/Projects.png" />
 
-<br />
 
-# Consul Registeration (Service Discovery)
+## ✈️ Service Discovery (Consul Registeration)
 
 #### appsettings.json:
 ```
@@ -247,19 +422,22 @@ app.MapHealthChecks("/health");
 app.UseDiscoveryClient();
 ```
 
-#### Consul Nodes on Ubuntu http://192.168.56.164:8500/ui :
+#### 🍎 Consul Nodes on Ubuntu 
+
+* Access to the Consul UI from http://192.168.56.164:8500/ui :
+
 <img src="img/Nodes.png" />
 
-#### Registered Services :
+#### Registered Services except Gateway :
 <img src="img/Services.png" />
 
 #### Order Service (e.g.) :
 <img src="img/OrderService.png" />
 
-#### DNS Settings :
+#### DNS Settings On each Consul nodes :
 <img src="img/dns.png" />
 
-#### Running the Services in Consul Nodes :
+#### Start to Running the all Services in Consul Nodes :
 ```
 dotnet restore
 dotnet build
@@ -269,7 +447,7 @@ dotnet run
 
 <img src="img/gRPC.png" />
 
-#### Get discount info from above gRPC address at basket :
+#### Getting discount info from above gRPC address at basket service :
 <img src="img/Basket.png" />
 
 #### Ocelot Gateway runs on http://Consul2:8000 :
@@ -284,23 +462,22 @@ dotnet run
 
 <img src="img/BasketUrl.png" />
 
-<br />
 
-# Call the Services via gateway :
+## ☎️ Call the Services via gateway :
 
-#### Add items to the customer's basket :
+#### 🛒🛍️ Add items to the customer's basket :
 
 <img src="img/Call1.png" />
 
-#### Checkout the basket with a tracking code (Awaiting Payment) :
+#### 🛒 Checkout the basket with a tracking code (Awaiting Payment) :
 
 <img src="img/Call2.png" />
 
-#### Payment for the related order :
+#### 💳 Payment action for the related order :
 
 <img src="img/Call3.png" />
 
-#### Order State Before Payment :
+#### Order State Before the Payment :
 
 <img src="img/OrderStateBeforePayment.png" />
 
@@ -308,11 +485,11 @@ dotnet run
 
 <img src="img/OrderTable.png" />
 
-#### Order Events Table :
+#### Order Events Table (Event Store) :
 
 <img src="img/OrderEvents.png" />
 
-#### Message Broker (RabbitMQ) :
+#### 🔀 Message Broker (RabbitMQ) :
 
 <img src="img/RabbitMQ.png" />
 

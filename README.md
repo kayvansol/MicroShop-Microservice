@@ -426,6 +426,11 @@ app.UseDiscoveryClient();
 
 <img src="img/Nodes2.png" />
 
+```
+Server IP, Host Name : 192.168.56.164, Consul1
+Client IP, Host Name : 192.168.56.165, Consul2
+```
+
 ### ⚒️ Install Consul on both Ubuntu :
 ```
 wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -478,12 +483,22 @@ sudo apt update && sudo apt install consul
 #### 🚔 Order Service (e.g.) :
 <img src="img/OrderService.png" />
 
-### 🚀🧨 Start to Running the all Services in Consul Nodes :
+### 🚀 Start to Running the all Services in Consul Nodes :
 ```
 dotnet restore
 dotnet build
 dotnet run
 ```
+### 🧨 Services Run at :
+```
+Discount.gRPC ---> Consul1
+Basket.API ---> Consul2
+OrderApi.Rest ---> Consul1
+Inventory.API  ---> Consul2
+Payment.API  ---> Consul1
+OcelotAPIGateway ---> Consul2
+```
+
 #### 💎 Discount.gRPC runs with http://Consul1:5046 :
 
 <img src="img/gRPC.png" />

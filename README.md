@@ -351,19 +351,28 @@ It contains the core business logic for order creation, validation, inventory re
 
 ## ✈️ Databases Migrations
 #### Entity Framework's Migrations & Scaffolding :
+MicroShop.Infra.Sql :
 ```
 Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShop;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Context -Force
 ```
+MicroShop.Infra.Sql :
 ```
 Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShopLogDB;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir LogContext -Force
 ```
+Discount.API :
+```
+Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShopDiscount;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Context -Force
+```
+Payment.API :
 ```
 Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShopPayment;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Context -Force
 ```
+MicroShop.OrderApi.Rest :
 ```
 Add-Migration InitOrderSaga -c OrderStateDbContext
 Update-Database -Context OrderStateDbContext
 ```
+MicroShop.OrderApi.Rest :
 ```
 Add-Migration InitialOrderEventStoreMigration -c OrderEventStoreDbContext 
 Update-Database -Context OrderEventStoreDbContext
@@ -381,6 +390,8 @@ Update-Database -Context OrderEventStoreDbContext
 
 
 ## 🚂 Service Discovery (Consul Registeration)
+
+### On the all Services (e.g. Basket.API) :
 
 #### 🔩 appsettings.json:
 ```
@@ -491,12 +502,12 @@ dotnet run
 ```
 ### 🧨 Services Run at :
 ```
-Discount.gRPC ---> Consul1
-Basket.API ---> Consul2
-OrderApi.Rest ---> Consul1
-Inventory.API  ---> Consul2
-Payment.API  ---> Consul1
-OcelotAPIGateway ---> Consul2
+Discount.gRPC    --->  Consul1
+Basket.API       --->  Consul2
+OrderApi.Rest    --->  Consul1
+Inventory.API    --->  Consul2
+Payment.API      --->  Consul1
+OcelotAPIGateway --->  Consul2
 ```
 
 #### 💎 Discount.gRPC runs with http://Consul1:5046 :

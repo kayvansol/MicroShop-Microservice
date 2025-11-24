@@ -349,7 +349,7 @@ It contains the core business logic for order creation, validation, inventory re
 * Managing the full lifecycle of an order and its domain events
 
 
-## 🎉 Databases Migrations
+## ✈️ Databases Migrations
 #### Entity Framework's Migrations & Scaffolding :
 ```
 Scaffold-DbContext "Data Source=.;Initial Catalog=MicroShop;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Context -Force
@@ -375,14 +375,14 @@ Update-Database -Context OrderEventStoreDbContext
 
 <br />
 
-## 🚀 Solution Structure :
+## 🏗️ Solution Structure :
 
 <img src="img/Projects.png" />
 
 
-## ✈️ Service Discovery (Consul Registeration)
+## 🚂 Service Discovery (Consul Registeration)
 
-#### appsettings.json:
+#### 🔩 appsettings.json:
 ```
 "spring": {
     "application": {
@@ -409,7 +409,7 @@ Update-Database -Context OrderEventStoreDbContext
     }
   }
 ```
-#### Program.cs :
+#### 📑 Program.cs :
 ```
 builder.Services.AddDiscoveryClient(builder.Configuration);
 
@@ -422,35 +422,76 @@ app.MapHealthChecks("/health");
 app.UseDiscoveryClient();
 ```
 
-#### 🍎 Consul Nodes on Ubuntu 
+### 🎡 Consul Nodes on Ubuntu 
 
-* Access to the Consul UI from http://192.168.56.164:8500/ui :
+<img src="img/Nodes2.png" />
+
+### ⚒️ Install Consul on both Ubuntu :
+```
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install consul
+```
+
+#### 🖥️ On the Server :
+
+<img src="img/ConsulVersion.png" />
+
+* ⚙️ Consul Server Config :
+
+<img src="img/ConsulServer1.png" />
+
+* 🚑 Set Consul as a Service :
+
+<img src="img/ConsulServer2.png" />
+
+* 🩺🌡️ Service Status :
+
+<img src="img/ConsulServer3.png" />
+
+#### 💻 On the Client :
+
+* ⚙️ Consul Client Config :
+
+<img src="img/ConsulClient1.png" />
+
+* 🚑 Set Consul as a Service :
+
+<img src="img/ConsulClient2.png" />
+
+* 🩺🌡️ Service Status :
+
+<img src="img/ConsulClient3.png" />
+
+#### 🛰️ DNS Settings On each Consul nodes :
+<img src="img/dns.png" />
+
+#### 📺 Access to the Consul UI from http://Consul1:8500/ui :
 
 <img src="img/Nodes.png" />
 
-#### Registered Services except Gateway :
+#### 🏥 Registered Services except Gateway :
 <img src="img/Services.png" />
 
-#### Order Service (e.g.) :
+#### 🚔 Order Service (e.g.) :
 <img src="img/OrderService.png" />
 
-#### DNS Settings On each Consul nodes :
-<img src="img/dns.png" />
-
-#### Start to Running the all Services in Consul Nodes :
+### 🚀🧨 Start to Running the all Services in Consul Nodes :
 ```
 dotnet restore
 dotnet build
 dotnet run
 ```
-#### Discount.gRPC runs with http://Consul1:5046 :
+#### 💎 Discount.gRPC runs with http://Consul1:5046 :
 
 <img src="img/gRPC.png" />
 
-#### Getting discount info from above gRPC address at basket service :
+#### 💸 Getting discount info from above gRPC address at basket service :
 <img src="img/Basket.png" />
 
-#### Ocelot Gateway runs on http://Consul2:8000 :
+#### 🚧 Ocelot Gateway runs on http://Consul2:8000 :
 
 <img src="img/OcelotGateway.png" />
 
@@ -477,15 +518,15 @@ dotnet run
 
 <img src="img/Call3.png" />
 
-#### Order State Before the Payment :
+#### ♻️ Order State Before the Payment :
 
 <img src="img/OrderStateBeforePayment.png" />
 
-#### Order & Items records :
+#### 📖 Order & Items records :
 
 <img src="img/OrderTable.png" />
 
-#### Order Events Table (Event Store) :
+#### 📝 Order Events Table (Event Store) :
 
 <img src="img/OrderEvents.png" />
 
@@ -493,7 +534,7 @@ dotnet run
 
 <img src="img/RabbitMQ.png" />
 
-#### Rabbit Exchanges
+#### 🎢 Rabbit Exchanges
 
 <img src="img/RabbitExchanges.png" />
 
@@ -501,6 +542,6 @@ dotnet run
 
 <img src="img/RabbitMQ2.png" />
 
-#### Git Commits :
+#### 🌵 Git Commits :
 
 <img src="img/Commits.png" />

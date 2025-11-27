@@ -84,13 +84,12 @@ I have implemented below features.
 * **Register** each service to mentioned Consul nodes with Hostnames
 * Using **Steeltoe** library to register and resolve the services
 
-
 ## 🎨 State Diagram
 #### Ordering flow with Masstransit Saga State Machine (OrderStateMachine)
 
 **Transitions** between these states are triggered by user actions or system processes (Saga), providing a clear overview of the customer journey from initial product search to final purchase and order confirmation.
 
-<img src="img/state.png" style="width:70%;"  />
+<img src="img/state.png" style="width:100%;"  />
 
 
 ### 📜 OrderStateMachine Class (MassTransit Saga State Machine) :
@@ -271,6 +270,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     }
 ```
 
+## <img src="img/Sticky.png"   /> Event Storming
+
+**Event Storming** is a fantastic modelling workshop for getting shared understanding of a business domain and designing software to match
+
+<img src="img/EventStorming.png" style="width:100%;"  />
 
 ## 📦 Domain-Driven Design — Order Service
 
@@ -329,14 +333,14 @@ It contains the core business logic for order creation, validation, inventory re
 | ------------------ | ------------------- | -------------------------------------------------------------------- |
 | **Basket**         | Conformist          | Order follows the data model shaped by Basket.                       |
 | **Discount**       | Customer → Supplier | Discount rules are defined by Discount service; Order consumes them. |
-| **Inventory**      | Supplier + ACL      | Order requests stock reservation;            |
+| **Inventory**      | Supplier + ACL      | Order requests stock count checking.           |
 | **Payment**        | Supplier            | Order initiates the payment workflow.                                |
 | **Ocelot Gateway** | Open-Host Service   | Order is exposed externally via the API Gateway.                     |
 
 
 ## 🎯 Responsibilities Summary
 
-#### The Order Service is responsible for:
+#### The Order Service (Bounded Context) is responsible for:
 
 * Receiving the user's basket and converting it into an order
 

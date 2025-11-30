@@ -1,9 +1,21 @@
-using Ocelot.Provider.Polly;
+﻿using Ocelot.Provider.Polly;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Ocelot.Provider.Consul;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin => true); // اجازه همه Origin ها
+    });
+});
 
 // load ocelot.json
 //builder.Configuration.AddJsonFile("ocelot.Development.json", optional: false, reloadOnChange: true);
@@ -25,6 +37,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 app.UseRouting();
 

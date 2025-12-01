@@ -41,6 +41,31 @@
     },
 
     {
+      "DownstreamPathTemplate": "/api/Products/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "order-service", // هدایت به OrderApi
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/products/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "ProductService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
       "DownstreamPathTemplate": "/api/Payment/{everything}",
       "DownstreamScheme": "http",
 

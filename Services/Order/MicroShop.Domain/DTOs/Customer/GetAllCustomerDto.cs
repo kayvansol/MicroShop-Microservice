@@ -3,6 +3,8 @@ namespace MicroShop.Domain.DTOs.Customer
 {
     public class GetAllCustomerDto
     {
+        public int CustomerId { get; set; }
+
         public string FirstName { get; set; } = null!;
 
         public string LastName { get; set; } = null!;

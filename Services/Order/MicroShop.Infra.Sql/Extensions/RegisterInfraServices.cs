@@ -4,6 +4,7 @@ using MicroShop.Infra.Sql.Repositories.CategoryRepo;
 using MicroShop.Infra.Sql.Repositories.CustomerRepo;
 using MicroShop.Infra.Sql.Repositories.OrderRepo;
 using MicroShop.Infra.Sql.Repositories.ProductRepo;
+using MicroShop.Infra.Sql.Repositories.OrderSateRepo;
 
 namespace MicroShop.Infra.Sql.Extensions
 {
@@ -17,6 +18,7 @@ namespace MicroShop.Infra.Sql.Extensions
             service.AddScoped<IProductRepository, ProductRepository>();
             service.AddScoped<ICustomerRepository, CustomerRepository>();
             service.AddScoped<IOrderRepository, OrderRepository>();
+            service.AddScoped<IOrderStatRepo, OrderStatRepo>();
         }
     }
 }

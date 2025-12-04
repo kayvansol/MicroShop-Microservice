@@ -18,7 +18,7 @@ namespace MicroShop.Infra.Sql.Repositories.OrderSateRepo
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT [CorrelationId],[OrderId],[CustomerId],[Created] FROM [MicroShop].[dbo].[OrderState]";
+                string query = "SELECT [CorrelationId],[OrderId],[CustomerId],[Created] FROM [MicroShop].[dbo].[OrderState]  where CancelReason is null";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {

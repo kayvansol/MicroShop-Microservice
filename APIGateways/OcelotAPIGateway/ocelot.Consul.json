@@ -66,6 +66,56 @@
     },
 
     {
+      "DownstreamPathTemplate": "/api/Customer/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "order-service", // هدایت به OrderApi
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/customer/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "CustomerService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/Category/{everything}",
+      "DownstreamScheme": "http",
+
+      "ServiceName": "order-service", // هدایت به OrderApi
+      "UseServiceDiscovery": true,
+
+      "UpstreamPathTemplate": "/category/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "Key": "CategoryService",
+      "Priority": 2,
+
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+
+      "RetryOptions": {
+        "RetryCount": 2,
+        "RetryBackOffPower": 2,
+        "RetryStatusCodes": [ "500", "502", "503", "504" ]
+      },
+
+      "DelegatingHandlers": [ "CorrelationIdDelegatingHandler" ]
+    },
+
+    {
       "DownstreamPathTemplate": "/api/Payment/{everything}",
       "DownstreamScheme": "http",
 

@@ -1,4 +1,5 @@
 ﻿
+using MicroShop.Domain.DTOs.Order;
 using MicroShop.Domain.Enums;
 
 namespace MicroShop.Infra.Sql.Repositories.OrderRepo
@@ -12,6 +13,7 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
         Task<bool> UpdateStatusAsync(int OrderId, EnumOrderState State);
 
         Task<bool> UpdateInventoriesAsync(int OrderId);
-
+        Task<List<GetAllOrders>> GetAllOrders();
+        Task<List<GetOrderItems>> GetOrderItems(int OrderId);
     }
 }

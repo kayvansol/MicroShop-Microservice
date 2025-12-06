@@ -1,6 +1,9 @@
 ﻿
 using MicroShop.Domain;
+using MicroShop.Domain.DTOs.Order;
 using MicroShop.Domain.Enums;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace MicroShop.Infra.Sql.Repositories.OrderRepo
@@ -71,5 +74,23 @@ namespace MicroShop.Infra.Sql.Repositories.OrderRepo
             return true;
         }
 
+
+        public async Task<List<GetAllOrders>> GetAllOrders()
+        {
+
+            var orderItems = await _context.GetAllOrders.FromSqlRaw("exec GetAllOrders").ToListAsync();
+
+            return orderItems;
+
+        }
+
+        public async Task<List<GetOrderItems>> GetOrderItems(int OrderId)
+        {
+            var _orderId = new SqlParameter("@OrderId", OrderId);
+            var orderItems = await _context.GetOrderItems.FromSqlRaw("exec GetOrderItems @OrderId", _orderId).ToListAsync();
+
+            return orderItems;
+
+        }
     }
 }

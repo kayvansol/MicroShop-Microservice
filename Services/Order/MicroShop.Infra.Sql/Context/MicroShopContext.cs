@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using MicroShop.Domain;
+using MicroShop.Domain.DTOs.Order;
 
 namespace MicroShop.Infra.Sql.Context;
 
@@ -25,6 +26,10 @@ public partial class MicroShopContext : DbContext
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
+
+    public DbSet<GetAllOrders> GetAllOrders { get; set; }
+
+    public DbSet<GetOrderItems> GetOrderItems { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
@@ -136,7 +141,7 @@ public partial class MicroShopContext : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("FK__order_ite__produ__37A5467C");
         });
-
+        
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.ProductId).HasName("PK__products__47027DF5925ACE04");
@@ -157,6 +162,16 @@ public partial class MicroShopContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK__products__catego__2E1BDC42");
+        });
+
+        modelBuilder.Entity<GetAllOrders>(entity =>
+        {
+            entity.HasKey(e => e.OrderId);
+        });
+
+        modelBuilder.Entity<GetOrderItems>(entity =>
+        {
+            entity.HasKey(e => e.itemId);
         });
 
         OnModelCreatingPartial(modelBuilder);
